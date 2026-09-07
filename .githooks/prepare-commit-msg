@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+# prepare-commit-msg - rewrite the commit subject into the project format:
+#   [:gitmoji:] type(#issue): message
+# Examples (branch chore/6-github-prehooks -> type=chore, issue=6):
+#   ":wrench: chore: did something" -> ":wrench: chore(#6): did something"
+#   "did something"                 -> "chore(#6): did something"
+#   ":bug: fix: bad thing"          -> ":bug: fix(#6): bad thing"
+#
+# Branch convention: <type>/<issue>-<description> (e.g. feat/123-add-login).
+# The gitmoji is kept if you provide one; a type you type wins over the branch type.
+set -euo pipefail
+
+COMMIT_MSG_FILE=$1
+COMMIT_SOURCE=${2:-}
+
+# Only rewrite plain commits / -m. Leave merge, squash, template, amend (-C/-c) alone.
+if [[ -n "$COMMIT_SOURCE" && "$COMMIT_SOURCE" != "message" ]]; then
+    exit 0
+fi
+
+BRANCH_NAME=$(git symbolic-ref --short HEAD 2>/dev/null || echo "")
+[[ -z "$BRANCH_NAME" ]] && exit 0
+
+# Skip protected / non-feature branches.
+if [[ "$BRANCH_NAME" =~ ^(main|master|develop|staging|release/.*)$ ]]; then
+    exit 0
+fi
+
+VALID_PREFIXES="feat|fix|hotfix|chore|docs|style|refactor|test|perf|ci|build|revert"
+
+# Extract type + issue from the branch (e.g. feat/123-add-login).
+if [[ "$BRANCH_NAME" =~ ^($VALID_PREFIXES)/([0-9]+)- ]]; then
+    BRANCH_PREFIX="${BASH_REMATCH[1]}"
+    ISSUE_NUMBER="${BASH_REMATCH[2]}"
+else
+    exit 0
+fi
+
+# First meaningful (non-comment, non-empty) line is the subject.
+SUBJECT=$(grep -v '^#' "$COMMIT_MSG_FILE" | grep -v '^[[:space:]]*$' | head -n 1)
+[[ -z "$SUBJECT" ]] && exit 0
+
+# Already formatted: "[:gitmoji: ]type(#number):" -> leave untouched (idempotent).
+if [[ "$SUBJECT" =~ ^(:[a-z0-9_+-]+:[[:space:]]+)?($VALID_PREFIXES)\(#[0-9]+\): ]]; then
+    exit 0
+fi
+
+GITMOJI=""
+MESSAGE="$SUBJECT"
+
+# Pull a leading gitmoji shortcode (":wrench:", ":sparkles:", ...).
+if [[ "$MESSAGE" =~ ^(:[a-z0-9_+-]+:)[[:space:]]*(.*) ]]; then
+    GITMOJI="${BASH_REMATCH[1]}"
+    MESSAGE="${BASH_REMATCH[2]}"
+fi
+
+# A type the user typed ("chore: ...") overrides the branch type.
+USER_PREFIX=""
+if [[ "$MESSAGE" =~ ^($VALID_PREFIXES):[[:space:]]*(.*) ]]; then
+    USER_PREFIX="${BASH_REMATCH[1]}"
+    MESSAGE="${BASH_REMATCH[2]}"
+fi
+
+# Trim surrounding whitespace.
+MESSAGE="${MESSAGE#"${MESSAGE%%[![:space:]]*}"}"
+MESSAGE="${MESSAGE%"${MESSAGE##*[![:space:]]}"}"
+[[ -z "$MESSAGE" ]] && exit 0
+
+PREFIX="${USER_PREFIX:-$BRANCH_PREFIX}"
+
+if [[ -n "$GITMOJI" ]]; then
+    NEW_SUBJECT="$GITMOJI $PREFIX(#$ISSUE_NUMBER): $MESSAGE"
+else
+    NEW_SUBJECT="$PREFIX(#$ISSUE_NUMBER): $MESSAGE"
+fi
+
+# Replace only the first line; preserve body and comments.
+BODY=$(tail -n +2 "$COMMIT_MSG_FILE")
+if [[ -n "$BODY" ]]; then
+    printf '%s\n%s\n' "$NEW_SUBJECT" "$BODY" > "$COMMIT_MSG_FILE"
+else
+    printf '%s\n' "$NEW_SUBJECT" > "$COMMIT_MSG_FILE"
+fi
