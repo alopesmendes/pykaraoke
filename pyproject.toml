@@ -1,0 +1,83 @@
+[project]
+name = "pykaraoke"
+version = "0.1.0"
+description = "Private karaoke night sign-up site."
+readme = "README.md"
+requires-python = ">=3.13"
+license = { text = "MIT" }
+
+dependencies = [
+    "django>=6.1,<6.2",
+    "django-environ>=0.12",
+    "psycopg[binary]>=3.2",
+    "gunicorn>=23.0",
+]
+
+# Local-only tooling (PEP 735). Never published, never in the production image:
+# the Dockerfile runs `uv sync --no-dev`.
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "pytest-django>=4.9",
+    "pytest-cov>=6.0",
+    "factory-boy>=3.3",
+    "ruff>=0.9",
+    "bandit>=1.8",
+    "pip-audit>=2.7",
+    "pre-commit>=4.0",
+    "django-debug-toolbar>=5.0",
+]
+
+# This is an application, not a library: nothing is ever built or published.
+[tool.uv]
+package = false
+
+# ---------------------------------------------------------------------------
+# Ruff — the only linter and formatter. No Black, no Flake8, no isort.
+# ---------------------------------------------------------------------------
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+extend-exclude = ["**/migrations/**"]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle
+    "F",   # Pyflakes
+    "I",   # isort — import ordering
+    "UP",  # pyupgrade
+    "B",   # bugbear — mutable defaults, silent except
+    "S",   # flake8-bandit — fast security feedback on every edit
+    "DJ",  # flake8-django
+    "C4",  # comprehensions
+    "SIM", # simplify
+]
+
+[tool.ruff.lint.per-file-ignores]
+# pytest's entire API is the bare `assert` statement.
+"tests/**" = ["S101"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["pykaraoke", "karaoke"]
+
+# ---------------------------------------------------------------------------
+# pytest — coverage flags live in the Makefile and CI, not here, so that
+# `pytest -x` stays fast while iterating.
+# ---------------------------------------------------------------------------
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "pykaraoke.settings"
+python_files = ["test_*.py"]
+testpaths = ["tests"]
+addopts = ["-ra", "--strict-markers", "--strict-config"]
+
+[tool.coverage.run]
+source = ["pykaraoke", "karaoke"]
+omit = ["*/migrations/*", "*/tests/*", "*/wsgi.py", "*/asgi.py", "manage.py"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+fail_under = 70
+
+[tool.bandit]
+exclude_dirs = ["tests", ".venv", "**/migrations"]
