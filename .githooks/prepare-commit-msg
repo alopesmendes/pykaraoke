@@ -18,6 +18,15 @@ if [[ -n "$COMMIT_SOURCE" && "$COMMIT_SOURCE" != "message" ]]; then
     exit 0
 fi
 
+# Leave an in-progress rebase, merge, cherry-pick or revert alone: those replay
+# existing subjects, and rewriting them corrupts history.
+GIT_DIR_PATH=$(git rev-parse --git-dir 2>/dev/null || echo "")
+if [[ -n "$GIT_DIR_PATH" ]]; then
+    for marker in rebase-merge rebase-apply MERGE_HEAD CHERRY_PICK_HEAD REVERT_HEAD; do
+        [[ -e "$GIT_DIR_PATH/$marker" ]] && exit 0
+    done
+fi
+
 BRANCH_NAME=$(git symbolic-ref --short HEAD 2>/dev/null || echo "")
 [[ -z "$BRANCH_NAME" ]] && exit 0
 
@@ -39,6 +48,13 @@ fi
 # First meaningful (non-comment, non-empty) line is the subject.
 SUBJECT=$(grep -v '^#' "$COMMIT_MSG_FILE" | grep -v '^[[:space:]]*$' | head -n 1)
 [[ -z "$SUBJECT" ]] && exit 0
+
+# `git commit --fixup/--squash` reports COMMIT_SOURCE as "message", so the check
+# above lets it through. The autosquash prefix must stay at the very start of the
+# subject or `git rebase --autosquash` will not match it.
+if [[ "$SUBJECT" =~ ^(fixup|squash|amend)! ]]; then
+    exit 0
+fi
 
 # Already formatted: "[:gitmoji: ]type(#number):" -> leave untouched (idempotent).
 if [[ "$SUBJECT" =~ ^(:[a-z0-9_+-]+:[[:space:]]+)?($VALID_PREFIXES)\(#[0-9]+\): ]]; then
