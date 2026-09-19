@@ -142,6 +142,38 @@ HTTP requests by default, so `SecurityMiddleware` will redirect them (301/302) i
 the view — a view test will need `client.get(url, secure=True)`, or it will look like the view is
 broken when the middleware is actually doing its job.
 
+### Chunk 4 — `Makefile` + `.pre-commit-config.yaml` + `.gitignore`
+
+- **bandit does not auto-discover `pyproject.toml`.** `bandit -qr .` alone ignored
+  `[tool.bandit] exclude_dirs` entirely and tried to scan `.venv`'s ~8,400 files (timed out at
+  120s). `bandit -qr . -c pyproject.toml` — the explicit `-c` — is what actually reads the config;
+  without it, `exclude_dirs` silently does nothing. Confirmed with `-v`: dependency count in
+  "Files excluded" jumped from missing entirely to 8,404 once `-c` was added.
+- **`--fail-level WARNING` belongs in a test with a simulated production environment, not in a
+  local `make` target that runs against the real `.env`.** First draft of `make audit` used
+  `--fail-level WARNING`, which meant `make check` could never pass in normal local development —
+  `DEBUG=True` and a placeholder key are *correct* for dev and *are* 6 expected warnings. The
+  strict version only makes sense where `pytest-env` (chunk 3) or a CI secret (chunk 7) actually
+  supplies production-shaped values. Caught by running `make check` for real, not by reasoning
+  about it — the exit code lied until it was actually invoked.
+- **A hook installed by `pre-commit install` and one symlinked by hand coexist without conflict**,
+  confirmed by installing `pre-commit`'s hook and checking that `prepare-commit-msg` (from the
+  earlier chunk 1.5 fix) was untouched. They are different files in `.git/hooks/`, one per git
+  hook *type* — this only works because core.hooksPath was deliberately left unset.
+  `pre-commit install` would have refused to run at all if `core.hooksPath` pointed elsewhere.
+- **`.uv/` is not a real thing** — corrected from the original plan. `uv`'s cache lives at
+  `~/.cache/uv`, global, never inside the project. Added to `.gitignore` on faith once, removed
+  once actually checked with `uv cache dir`.
+- **Proved the hook does real work, not just that it exists.** Staged a file with an unused
+  import and 2-space-then-tabs mess plus a file with trailing whitespace and no final newline, ran
+  the installed hook directly (not `git commit` — that stays denied), and watched `ruff check
+  --fix`, `ruff format`, `trailing-whitespace`, and `end-of-file-fixer` each report "files were
+  modified by this hook" and actually fix them. Done in a disposable `git worktree`, removed after.
+- **`pre-commit run --all-files` catches files the per-commit hook never saw.** `.env.example` was
+  missing its trailing newline — written before the hook existed, never re-committed since, so
+  `end-of-file-fixer` never ran on it. `--all-files` is the retroactive sweep; from here on it runs
+  at the end of every chunk, not only reactively when something looks off.
+
 ## Still unclear
 
 *Add anything Claude wrote that you could not follow line by line.*
@@ -150,4 +182,7 @@ broken when the middleware is actually doing its job.
 - What `uv.lock`'s per-package hashes actually protect against.
 - Why `django-environ` treats "present but empty" and "absent" as different states instead of
   normalizing an empty string to "use the default".
+- The pre-commit hook test printed a `VIRTUAL_ENV=...does not match the project environment path`
+  warning from `uv`, then created a fresh `.venv` inside the worktree anyway. Worth understanding
+  exactly what `uv run` resolves to when invoked outside the directory holding `pyproject.toml`.
 -

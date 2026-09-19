@@ -47,3 +47,12 @@ db.sqlite3-journal
 # Environment
 .env
 .env.local
+
+# Test / lint / coverage caches
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Claude Code — personal overrides, never shared
+.claude/settings.local.json
