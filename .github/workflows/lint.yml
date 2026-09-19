@@ -1,0 +1,42 @@
+name: Lint
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lint-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v10.1.0
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Install dependencies
+        run: uv sync --locked --all-groups
+
+      - name: Cache pre-commit hook environments
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
+
+      # Runs the exact .pre-commit-config.yaml the local git hook runs — one
+      # file defines "what lint means" for both. Deliberately not the
+      # pre-commit/action marketplace action: it installs its own pre-commit
+      # via pip, bypassing the version pinned in uv.lock. This reuses that
+      # pinned version instead, so CI can never disagree with a local run.
+      - name: Run pre-commit
+        run: uv run pre-commit run --all-files --show-diff-on-failure

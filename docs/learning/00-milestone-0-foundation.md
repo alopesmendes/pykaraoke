@@ -196,6 +196,34 @@ broken when the middleware is actually doing its job.
   Compose V2 ignores it entirely (it's obsolete, not merely optional) and can print a warning.
   Omitted on purpose, not forgotten.
 
+### Chunk 6 — `lint.yml` + `test.yml`
+
+- **Not every GitHub Action publishes a floating major-version tag.** `actions/checkout`,
+  `actions/cache`, and `actions/upload-artifact` all maintain one (`@v7`, `@v6`, `@v7`) — but
+  `astral-sh/setup-uv` only ever tags exact versions (`v10.0.0`, `v10.0.1`, `v10.1.0`, never a bare
+  `v10`). Checked with `gh api repos/<owner>/<repo>/git/refs/tags` before writing the pin, not
+  after CI failed on it — same lesson as chunk 5's image-tag miss, different registry.
+- **A marketplace action for a tool already in `uv.lock` can silently use a different version of
+  that tool.** `pre-commit/action` installs its own `pre-commit` via `pip`, independent of the
+  exact version this project pinned in `dependency-groups.dev`. Used `uv run pre-commit run
+  --all-files` directly instead — the same command chunk 4 already runs locally, so CI can never
+  disagree with a local run about what "lint" means.
+- **`coverage.py` warns on every single run for a `source` package that was never imported.**
+  `[tool.coverage.run] source = ["pykaraoke", "karaoke"]` listed an app that doesn't exist until
+  Milestone 1 — caught by actually running `pytest --cov` before writing `test.yml`, not by
+  re-reading `pyproject.toml`. Fixed by dropping `karaoke` until the app is real.
+- **An artifact path that doesn't exist yet doesn't fail the job — it just uploads nothing.**
+  `test.yml` requested `htmlcov/` in `upload-artifact` before the pytest command actually asked
+  for an HTML report (`--cov-report=html`). Would have "succeeded" while silently uploading an
+  empty artifact — the kind of bug that looks fine in a green CI run.
+- **`actionlint` (via `uvx --from actionlint-py actionlint`) checks the workflow schema and
+  expression syntax for real** — plain `yaml.safe_load` only proves the file parses as YAML, not
+  that GitHub Actions can run it. Both workflows passed clean, but this is now a standing check for
+  every future workflow file.
+- **Postgres was deliberately left out of `test.yml` for now.** The `github-actions` skill already
+  documents the exact service-container block to add — this chunk chose *when*, not *whether*: it
+  arrives with Milestone 2's first real model, not speculatively ahead of it.
+
 ## Still unclear
 
 *Add anything Claude wrote that you could not follow line by line.*
@@ -207,4 +235,7 @@ broken when the middleware is actually doing its job.
 - The pre-commit hook test printed a `VIRTUAL_ENV=...does not match the project environment path`
   warning from `uv`, then created a fresh `.venv` inside the worktree anyway. Worth understanding
   exactly what `uv run` resolves to when invoked outside the directory holding `pyproject.toml`.
+- How `astral-sh/setup-uv`'s `python-version` input actually gets Python onto the runner — does it
+  download and install that version itself (like `uv python install` would locally), or does it
+  only select among Python versions the GitHub-hosted runner image already ships?
 -

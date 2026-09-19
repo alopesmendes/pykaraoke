@@ -41,10 +41,10 @@ Three rules behind that block:
 
 ```yaml
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v10.1.0
         with:
           enable-cache: true
           cache-dependency-glob: "uv.lock"
@@ -57,7 +57,10 @@ Three rules behind that block:
   never silently resolve different versions than your machine.
 - `cache-dependency-glob: uv.lock` keys the cache on the lockfile, so the cache invalidates
   exactly when dependencies change.
-- Pin actions to a major tag (`@v4`). Do not float on `@main`.
+- Pin actions to a major tag (`@v7`) when the maintainer publishes one. Do not float on `@main`.
+  **Some don't publish one at all** — `astral-sh/setup-uv` only ever tags exact versions
+  (`v10.1.0`, never a floating `v10`); a pin to `@v10` fails outright. Check
+  `gh api repos/<owner>/<repo>/git/refs/tags` before writing the pin, not after CI fails on it.
 
 ## Matrix
 
@@ -72,6 +75,10 @@ Three rules behind that block:
 `test.yml` — linting once is enough.
 
 ## Postgres service container
+
+Not in `test.yml` yet — today's `DATABASE_URL` is blank (SQLite fallback) and there are zero
+models until Milestone 2. Add this block to `test.yml` alongside the first real migration, not
+speculatively ahead of it.
 
 ```yaml
     services:
@@ -120,6 +127,12 @@ which is how `deploy-production` waits for a human click instead of a branch rul
 
 `needs:` chains the jobs; the `production` environment's protection rules hold the run until
 approved. Configure the reviewers in **Settings → Environments**, not in YAML.
+
+## Verify a workflow before pushing it
+
+`uvx --from actionlint-py actionlint .github/workflows/*.yml` — real schema, expression syntax,
+and shellcheck-on-`run:` checks, not just "is this valid YAML." Catches most mistakes with no
+GitHub Actions minutes spent finding out the hard way.
 
 ## Debugging a red run
 

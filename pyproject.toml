@@ -81,7 +81,9 @@ env = [
 ]
 
 [tool.coverage.run]
-source = ["pykaraoke", "karaoke"]
+# "karaoke" is added back once Milestone 1 creates that app — coverage.py
+# warns on every run for a source package that was never imported.
+source = ["pykaraoke"]
 omit = ["*/migrations/*", "*/tests/*", "*/wsgi.py", "*/asgi.py", "manage.py"]
 
 [tool.coverage.report]
