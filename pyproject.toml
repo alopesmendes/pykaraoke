@@ -20,6 +20,7 @@ dev = [
     "pytest>=8.3",
     "pytest-django>=4.9",
     "pytest-cov>=6.0",
+    "pytest-env>=1.1",
     "factory-boy>=3.3",
     "ruff>=0.9",
     "bandit>=1.8",
@@ -69,6 +70,15 @@ DJANGO_SETTINGS_MODULE = "pykaraoke.settings"
 python_files = ["test_*.py"]
 testpaths = ["tests"]
 addopts = ["-ra", "--strict-markers", "--strict-config"]
+# pytest-env sets these before Django imports settings.py, so the test suite
+# never depends on the developer's real .env. This key is a random throwaway,
+# never used outside the test session — it satisfies check --deploy's length
+# and entropy warnings without being an actual secret.
+env = [
+    "DJANGO_DEBUG=False",
+    "DJANGO_SECRET_KEY=LoGfWyqNt1XvFHL13638FhEjHLTKcrUwIyqqAaT-lrp97qUsC_S7Un3QyQVVHJr9fOc",
+    "DJANGO_ALLOWED_HOSTS=testserver",
+]
 
 [tool.coverage.run]
 source = ["pykaraoke", "karaoke"]

@@ -98,10 +98,56 @@ Phase 0.2 (coming — these are the ones to actually learn):
 - **`uv sync --no-dev` genuinely removes the dev group** — verified: `import pytest` then raises
   `ModuleNotFoundError`. That is what keeps pytest and ruff out of the production image.
 
+### Chunk 2 — `settings.py` env wiring
+
+- **`env.db(KEY, default=...)` only falls back when `KEY` is absent — not when it is present and
+  blank.** `DATABASE_URL=` in `.env` (nothing after `=`) counts as "set", so `default=` never
+  fires. It parses to `ENGINE=''`, which Django's dummy backend rejects with
+  `ImproperlyConfigured`. Fix: read the raw value first (`env("DATABASE_URL", default="")`) and
+  treat the empty string as absent yourself — `value or default`. Same bug, same fix, for
+  `env.email_url()`.
+- **Django 6.1 replaced `EMAIL_BACKEND`/`EMAIL_HOST`/... with a single `MAILERS` dict** —
+  genuinely new, not a hallucination (checked twice against the real Django 6.1 docs after the
+  claim looked suspicious). `django-environ`'s `env.email_url()` still only understands the old
+  flat keys, so its result has to be mapped into `MAILERS["default"]["OPTIONS"]` by hand.
+- **A permission deny rule can be too broad in a way you only discover by hitting it.**
+  `Read(./.env.*)` was meant to protect `.env`, but it also blocked writing `.env.example` — a
+  file that is supposed to be committed. Fixing your own `.claude/settings.json` from inside a
+  session is itself denied (self-modifying permissions is treated as risky), so that edit and the
+  `.env.example` write both had to happen by hand, outside Claude.
+- **`target-version = "py313"` vs the installed interpreter (3.14.4) are different knobs** — worth
+  repeating from chunk 1, it came up again reasoning about which Python `manage.py` actually runs.
+
+### Chunk 3 — `tests/` smoke test
+
+- **`call_command("check", deploy=True)` doesn't raise on warnings by default** — `check`'s
+  `fail_level` defaults to `ERROR`. Without `fail_level="WARNING"` the test would pass even with
+  every one of chunk 2's 6 warnings present; it would test nothing.
+- **Django's test framework forces the mail backend to `locmem`, always, no opt-out** — so that
+  `mail.outbox` works in any test. Under Django 6.1's `MAILERS` dict, `--deploy`'s `mail.E001`
+  check correctly flags `locmem` as a dev-only backend — meaning the unscoped `--deploy` check
+  **cannot pass under any Django test suite, in any project**, not just this one. `--tag security`
+  scopes the test to what it can actually prove; `--list-tags --deploy` shows the other 13
+  available tags (`admin`, `caches`, `mail`, `models`, ...) for when they're needed.
+- **A test that cannot fail is not a test.** Proved this one could: broke `SECURE_SSL_REDIRECT`
+  on purpose, watched the exact test fail with the exact warning, then restored it and watched all
+  three pass again.
+- **`pytest-env` sets environment variables before Django imports `settings.py`.** This matters
+  because `settings.py` calls `env(...)` at *import time* — a fixture or `monkeypatch` that runs
+  after Django is already loaded is too late to affect `SECRET_KEY`, `DEBUG`, or `ALLOWED_HOSTS`.
+
+**Flagged for Milestone 2, not hit yet:** `DJANGO_DEBUG=False` for the whole test session means
+`SECURE_SSL_REDIRECT = not DEBUG` is `True` during every test. Django's test client makes plain
+HTTP requests by default, so `SecurityMiddleware` will redirect them (301/302) instead of hitting
+the view — a view test will need `client.get(url, secure=True)`, or it will look like the view is
+broken when the middleware is actually doing its job.
+
 ## Still unclear
 
 *Add anything Claude wrote that you could not follow line by line.*
 
 - `[tool.uv] package = false` — why an application needs it and a library does not.
 - What `uv.lock`'s per-package hashes actually protect against.
+- Why `django-environ` treats "present but empty" and "absent" as different states instead of
+  normalizing an empty string to "use the default".
 -
