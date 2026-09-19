@@ -1,0 +1,58 @@
+name: Security
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  schedule:
+    # Monday 06:00 UTC. Dependency vulnerabilities can appear with no code
+    # change on this repo's side, so pip-audit needs to rerun even when
+    # nothing was pushed.
+    - cron: "0 6 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v10.1.0
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Install dependencies
+        run: uv sync --locked --all-groups
+
+      # -c is required: bandit ignores [tool.bandit] entirely without it and
+      # crawls .venv's thousands of files instead — see the Makefile's audit
+      # target and chunk 4's notes in docs/learning/.
+      - name: Bandit
+        run: uv run bandit -qr . -c pyproject.toml
+
+      - name: pip-audit
+        run: uv run pip-audit
+
+      # Scoped to --tag security, same as `make audit` and tests/test_smoke.py:
+      # nothing configures a real SMTP backend yet, so the unscoped --deploy
+      # check fails on mail.E001 regardless of environment (see chunk 3's
+      # notes — that check flags any dev-only mail backend, not just
+      # pytest's forced locmem). --fail-level WARNING because CI, unlike
+      # local dev, should be held to the production-shaped bar. The secret
+      # key below is the same throwaway value tests/ already uses via
+      # pytest-env — it exists only to satisfy length/entropy checks, never
+      # a real credential.
+      - name: Django deploy check
+        env:
+          DJANGO_DEBUG: "False"
+          DJANGO_SECRET_KEY: "LoGfWyqNt1XvFHL13638FhEjHLTKcrUwIyqqAaT-lrp97qUsC_S7Un3QyQVVHJr9fOc"
+          DJANGO_ALLOWED_HOSTS: "example.com"
+        run: uv run python manage.py check --deploy --tag security --fail-level WARNING

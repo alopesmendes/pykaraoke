@@ -224,6 +224,32 @@ broken when the middleware is actually doing its job.
   documents the exact service-container block to add — this chunk chose *when*, not *whether*: it
   arrives with Milestone 2's first real model, not speculatively ahead of it.
 
+### Chunk 7 — `security.yml` + `deploy.yml`
+
+- **A local reusable workflow needs `workflow_call:` added to its own `on:` before anything else
+  can `uses:` it.** `lint.yml` and `test.yml` already existed from chunk 6 with only `push` and
+  `pull_request` triggers; `deploy.yml` calling them via `uses: ./.github/workflows/lint.yml`
+  would have failed without adding `workflow_call:` to each one's trigger list first. One file
+  still defines "lint passes" — `deploy.yml` just requires it, with zero duplicated steps.
+- **`needs:` only grants access to outputs of jobs listed in *that job's own* `needs:` array, not
+  transitively.** `deploy-production` depends on `deploy-staging`, which depends on `build` — but
+  reading `needs.build.outputs.image` from `deploy-production` required listing `build` in
+  `deploy-production`'s own `needs: [build, deploy-staging]`, even though the ordering already
+  went through `deploy-staging`. Ordering and data access are two separate things `needs:` grants.
+- **`docker/metadata-action`'s `type=sha` already defaults to `format=short` with a `sha-` prefix**
+  (`sha-860c190`) — checked the actual README before adding a redundant `format=short` that would
+  have changed nothing. Chunks 5 and 6 both caught a *wrong* assumption about a tool; this one was
+  right, but verified anyway rather than assumed, which is the actual habit worth keeping.
+- **`security.yml`'s Django deploy check reuses the exact throwaway `DJANGO_SECRET_KEY` string
+  from `tests/test_smoke.py`'s `pytest-env` block**, not a new one. One throwaway value, one place
+  it's defined in spirit — a second random string floating around would just be one more thing to
+  explain later as "also not a real secret."
+- **GitHub auto-creates an `environment:` the first time a workflow references it** — `staging`
+  and `production` do not need to exist in repo settings before this workflow can run. What does
+  **not** happen automatically: required-reviewer protection on `production`. That is a manual
+  step in Settings → Environments, outside any file in this repo, and nothing enforces it until
+  someone does it.
+
 ## Still unclear
 
 *Add anything Claude wrote that you could not follow line by line.*
@@ -238,4 +264,7 @@ broken when the middleware is actually doing its job.
 - How `astral-sh/setup-uv`'s `python-version` input actually gets Python onto the runner — does it
   download and install that version itself (like `uv python install` would locally), or does it
   only select among Python versions the GitHub-hosted runner image already ships?
+- What `cache-from: type=gha` / `cache-to: type=gha,mode=max` in `docker/build-push-action`
+  actually store and where — is this the same cache GitHub Actions uses for `actions/cache`, or a
+  separate mechanism specific to `buildx`?
 -
