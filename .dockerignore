@@ -1,0 +1,28 @@
+# Without this, `COPY . .` in the Dockerfile bakes these into image layers —
+# .dockerignore is separate from .gitignore and not implied by it.
+.git/
+.github/
+.githooks/
+.claude/
+.idea/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+db.sqlite3
+db.sqlite3-journal
+
+# Secrets — never in the build context, never in an image layer.
+.env
+.env.*
+!.env.example
+
+# Not needed at runtime.
+docs/
+tests/
+*.md
+Dockerfile
+docker-compose.yml

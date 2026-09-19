@@ -174,6 +174,28 @@ broken when the middleware is actually doing its job.
   `end-of-file-fixer` never ran on it. `--all-files` is the retroactive sweep; from here on it runs
   at the end of every chunk, not only reactively when something looks off.
 
+### Chunk 5 — `Dockerfile` + `docker-compose.yml`
+
+- **`.dockerignore` is a completely separate mechanism from `.gitignore`.** `COPY . .` in the
+  Dockerfile does not consult `.gitignore` at all — without `.dockerignore`, the real local `.env`
+  (which exists on disk, gitignored or not) would have been copied straight into an image layer.
+  Two different files, two different jobs: one controls commits, the other controls build context.
+- **A registry's `tags/list` API is paginated, and the default page isn't alphabetical or
+  chronological.** `ghcr.io/astral-sh/uv:python3.13-bookworm-slim` looked like a 404 waiting to
+  happen — the first 100-tag page had `python3.12` as the newest unversioned "python3.NN" tag and
+  no `3.13` at all. Requesting `?n=1000` surfaced it immediately. The lesson isn't "trust the tag
+  name because it looks plausible" — it's **query the registry with a page size large enough to
+  not silently drop the answer**, since a small, wrong page can look exactly like "doesn't exist."
+- **Multi-stage builds don't run any `manage.py` command at build time in this Dockerfile — not
+  even `collectstatic`.** `settings.py` (chunk 2) calls `env("DJANGO_SECRET_KEY")` with no default
+  at import time, so *any* `manage.py` invocation during `docker build` — with no real secrets
+  available yet — would crash the build. `collectstatic` and `migrate` are deliberately deferred
+  to a real deploy step in a later milestone, run with real runtime secrets, not baked into the
+  image.
+- **No `version:` key at the top of `docker-compose.yml`.** Older tutorials show `version: "3.8"`;
+  Compose V2 ignores it entirely (it's obsolete, not merely optional) and can print a warning.
+  Omitted on purpose, not forgotten.
+
 ## Still unclear
 
 *Add anything Claude wrote that you could not follow line by line.*
