@@ -2,8 +2,8 @@
 
 *Every URL, what it accepts, what it returns, and who is allowed to reach it.*
 
-This is a server-rendered Django MTV app. "API" here means URL patterns, forms and templates —
-there are no JSON endpoints. Status: **designed, not implemented** (Milestones 2–3).
+This is a server-rendered Django MTV app. "API" here means URL patterns, forms and templates.
+There are no JSON endpoints. Status: **designed, not implemented** (Milestones 2-3).
 
 ## Routes
 
@@ -14,17 +14,17 @@ All app routes are namespaced `karaoke:` and reversed by name, never hardcoded.
 | `karaoke:enter`          | `/e/<str:token>/`                                   | GET       | `enter`          | `enter.html`          | valid token               |
 | `karaoke:sign_up`        | `/e/<str:token>/sign-up/`                           | GET, POST | `sign_up`        | `sign_up.html`        | valid token               |
 | `karaoke:overview`       | `/e/<str:token>/overview/`                          | GET       | `overview`       | `overview.html`       | valid token               |
-| `karaoke:update_status`  | `/e/<str:token>/me/status/`                         | POST      | `update_status`  | — (redirect)          | valid token + own session |
-| `karaoke:cancel`         | `/e/<str:token>/me/cancel/`                         | POST      | `cancel`         | — (redirect)          | valid token + own session |
+| `karaoke:update_status`  | `/e/<str:token>/me/status/`                         | POST      | `update_status`  | none (redirect)       | valid token + own session |
+| `karaoke:cancel`         | `/e/<str:token>/me/cancel/`                         | POST      | `cancel`         | none (redirect)       | valid token + own session |
 | `karaoke:songs`          | `/e/<str:token>/me/songs/`                          | GET, POST | `songs`          | `songs.html`          | valid token + own session |
 | `karaoke:admin_overview` | `/e/<str:token>/admin/`                             | GET       | `admin_overview` | `admin_overview.html` | staff                     |
-| `karaoke:admin_cancel`   | `/e/<str:token>/admin/cancel/<int:participant_id>/` | POST      | `admin_cancel`   | — (redirect)          | staff                     |
+| `karaoke:admin_cancel`   | `/e/<str:token>/admin/cancel/<int:participant_id>/` | POST      | `admin_cancel`   | none (redirect)       | staff                     |
 
 Rules baked into that table:
 
 - **Every state change is POST and ends in a redirect** (POST/Redirect/GET). A GET never mutates.
 - **Identity comes from the URL token plus the session**, never from a hidden form field.
-- **An invalid or unknown token returns 404, not 403** — a 403 confirms the event exists.
+- **An invalid or unknown token returns 404, not 403**: a 403 confirms the event exists.
 - Admin routes require `request.user.is_staff`; a non-staff visitor gets 404 for the same reason.
 
 ## Forms
@@ -34,7 +34,7 @@ Rules baked into that table:
 | Field             | Type                       | Required | Constraints                            | Error (source string)                                                                    |
 |-------------------|----------------------------|----------|----------------------------------------|------------------------------------------------------------------------------------------|
 | `pseudo`          | `CharField`                | yes      | 2–40 chars, stripped, unique per event | "Pseudo must be at least 2 characters." / "That pseudo is already taken for this event." |
-| `full_name`       | `CharField`                | no       | ≤ 80 chars                             | —                                                                                        |
+| `full_name`       | `CharField`                | no       | ≤ 80 chars                             | none                                                                                     |
 | `contact`         | `CharField`                | no       | valid email or E.164 phone             | "Enter a valid email address or phone number."                                           |
 | `attending_dates` | `ModelMultipleChoiceField` | yes      | ≥ 1, must belong to this event         | "Pick at least one date."                                                                |
 | `invites`         | `IntegerField`             | no       | 0–3                                    | "You can bring at most 3 guests."                                                        |
@@ -50,7 +50,7 @@ the one users see.
 | `artist`   | `CharField`    | no       | ≤ 120 chars     |
 | `position` | `IntegerField` | no       | reordering only |
 
-`MAX_SONGS_PER_PARTICIPANT` (default 3) is enforced in `services.py`, not in the form — it is
+`MAX_SONGS_PER_PARTICIPANT` (default 3) is enforced in `services.py`, not in the form. It is
 per-event policy.
 
 ### StatusForm → `karaoke:update_status`
@@ -77,12 +77,12 @@ The toaster is `django.contrib.messages`, rendered once in `base.html`. Level �
 | `success` | Seat confirmed, songs saved                                                   |
 | `info`    | Placed on the waiting list                                                    |
 | `warning` | Seat released, participant cancelled by admin                                 |
-| `error`   | Action refused — event closed, not your row, validation failed after redirect |
+| `error`   | Action refused: event closed, not your row, validation failed after redirect |
 
 ## Confirmation modal
 
 Every cancellation route (`karaoke:cancel`, `karaoke:admin_cancel`) is fronted by a modal that
-names the pseudo and the event. The modal submits a real POST form with `{% csrf_token %}` — never
+names the pseudo and the event. The modal submits a real POST form with `{% csrf_token %}`, never
 a link. Without JavaScript the form still submits, so cancellation degrades to a plain page.
 
 ## Errors

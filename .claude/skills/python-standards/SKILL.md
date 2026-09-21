@@ -1,11 +1,11 @@
 ---
 name: python-standards
-description: Python coding conventions for pykaraoke — type hints, early returns, naming, error handling, and the Ruff rules this repo enforces. Use when writing or reviewing any .py file, when a lint error needs explaining, when deciding how to raise or handle an exception, or when asked "is this Pythonic?".
+description: Python coding conventions for pykaraoke. Type hints, early returns, naming, error handling, and the Ruff rules this repo enforces. Use when writing or reviewing any .py file, when a lint error needs explaining, when deciding how to raise or handle an exception, or when asked "is this Pythonic?".
 ---
 
 # Python standards (pykaraoke)
 
-Python 3.13+. Ruff is the only linter/formatter — no Black, no Flake8, no isort.
+Python 3.13+. Ruff is the only linter/formatter. No Black, no Flake8, no isort.
 
 ## Non-negotiables
 
@@ -81,7 +81,7 @@ excluded entirely (generated code).
 ## When Ruff and readability disagree
 
 Ruff wins on style. If a rule is genuinely wrong for a line, add a scoped
-`# noqa: <CODE>  # reason` on that line — never a file-level or blanket `# noqa`. A `noqa`
+`# noqa: <CODE>  # reason` on that line. Never a file-level or blanket `# noqa`. A `noqa`
 without a reason comment is a review blocker.
 
 ## Docstrings

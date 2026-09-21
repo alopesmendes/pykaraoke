@@ -1,6 +1,6 @@
 ---
 name: github-actions
-description: GitHub Actions conventions for pykaraoke — workflow anatomy, uv caching, matrix builds, Postgres service containers, least-privilege permissions, environments and approval gates. Use when creating or editing anything under .github/workflows/, when CI is red or slow, or when adding a secret, an environment, or a deploy step.
+description: GitHub Actions conventions for pykaraoke. Workflow anatomy, uv caching, matrix builds, Postgres service containers, least-privilege permissions, environments and approval gates. Use when creating or editing anything under .github/workflows/, when CI is red or slow, or when adding a secret, an environment, or a deploy step.
 ---
 
 # GitHub Actions (pykaraoke)
@@ -32,7 +32,7 @@ Three rules behind that block:
    `packages: write` only in the job that pushes to GHCR, `id-token: write` only for OIDC.
    Never leave the repository default in place.
 2. **`concurrency` with `cancel-in-progress`** so a force-push does not burn minutes on a stale
-   commit. Never cancel in progress on `deploy.yml` — a half-cancelled deploy is worse than a
+   commit. Never cancel in progress on `deploy.yml`. A half-cancelled deploy is worse than a
    wasted minute.
 3. **`on.pull_request` without a branch filter**, `on.push` limited to `master`. Otherwise every
    PR runs twice.
@@ -58,7 +58,7 @@ Three rules behind that block:
 - `cache-dependency-glob: uv.lock` keys the cache on the lockfile, so the cache invalidates
   exactly when dependencies change.
 - Pin actions to a major tag (`@v7`) when the maintainer publishes one. Do not float on `@main`.
-  **Some don't publish one at all** — `astral-sh/setup-uv` only ever tags exact versions
+  **Some don't publish one at all**: `astral-sh/setup-uv` only ever tags exact versions
   (`v10.1.0`, never a floating `v10`); a pin to `@v10` fails outright. Check
   `gh api repos/<owner>/<repo>/git/refs/tags` before writing the pin, not after CI fails on it.
 
@@ -72,11 +72,11 @@ Three rules behind that block:
 ```
 
 `fail-fast: false` so one Python version failing still tells you about the other. Matrix only on
-`test.yml` — linting once is enough.
+`test.yml`. Linting once is enough.
 
 ## Postgres service container
 
-Not in `test.yml` yet — today's `DATABASE_URL` is blank (SQLite fallback) and there are zero
+Not in `test.yml` yet. Today's `DATABASE_URL` is blank (SQLite fallback) and there are zero
 models until Milestone 2. Add this block to `test.yml` alongside the first real migration, not
 speculatively ahead of it.
 
@@ -107,13 +107,13 @@ connections and fails intermittently. The job then reaches it at
 | Non-secret config | `env:` in the workflow | `DJANGO_SETTINGS_MODULE` |
 | Repository secret | `${{ secrets.X }}` | `DJANGO_SECRET_KEY` for the deploy job |
 | Environment secret | `environment: production` + `${{ secrets.X }}` | provider token |
-| Built-in | `${{ secrets.GITHUB_TOKEN }}` | pushing to GHCR — no PAT needed |
+| Built-in | `${{ secrets.GITHUB_TOKEN }}` | pushing to GHCR, no PAT needed |
 
 **Never `echo` a secret**, never put one in a job name or an artifact. GitHub masks known secrets
 in logs, but not values you derive from them.
 
-`environment:` gives two things worth having: scoped secrets, and **required reviewers** —
-which is how `deploy-production` waits for a human click instead of a branch rule.
+`environment:` gives two things worth having: scoped secrets, and **required reviewers**.
+That is how `deploy-production` waits for a human click instead of a branch rule.
 
 ## Deploy gating
 
@@ -130,13 +130,13 @@ approved. Configure the reviewers in **Settings → Environments**, not in YAML.
 
 ## Verify a workflow before pushing it
 
-`uvx --from actionlint-py actionlint .github/workflows/*.yml` — real schema, expression syntax,
+`uvx --from actionlint-py actionlint .github/workflows/*.yml`. Real schema, expression syntax,
 and shellcheck-on-`run:` checks, not just "is this valid YAML." Catches most mistakes with no
 GitHub Actions minutes spent finding out the hard way.
 
 ## Debugging a red run
 
-1. `gh run list --limit 5` then `gh run view <id> --log-failed` — read the actual failure.
+1. `gh run list --limit 5` then `gh run view <id> --log-failed`. Read the actual failure.
 2. Reproduce locally first: `make check` runs the same gates.
 3. `uv sync --locked` failing locally means the lockfile is stale → `uv lock` and commit it.
 4. Only then touch the YAML.

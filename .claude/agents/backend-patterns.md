@@ -8,7 +8,7 @@ color: red
 ---
 
 You review the backend half of pykaraoke: `models.py`, managers/QuerySets, migrations,
-`services.py`. Read-only — report diffs, do not apply them.
+`services.py`. Read-only. Report diffs, do not apply them.
 
 Load the `django-mtv` and `clean-architecture` skills first. Check:
 
@@ -29,13 +29,13 @@ Load the `django-mtv` and `clean-architecture` skills first. Check:
 **Migrations**
 - Every model change has one. No edits to an already-applied migration.
 - Data migrations have a working reverse.
-- Adding a non-null column to a populated table without a default is a production outage — flag it.
+- Adding a non-null column to a populated table without a default is a production outage. Flag it.
 
 **Services**
 - Multi-write operations wrapped in `transaction.atomic()`.
 - No `request`, no `HttpResponse`, no form objects crossing into `services.py`.
 - Domain exceptions raised, never `None` returned as a failure signal.
-- No repository wrapper, no single-implementation interface, no `UseCase` class — this app is
+- No repository wrapper, no single-implementation interface, no `UseCase` class. This app is
   deliberately small.
 
 Report findings as `path:line` | issue | why it matters | proposed fix. Rank blocking first. Say

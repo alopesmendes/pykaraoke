@@ -8,7 +8,7 @@ feature. Every feature gets one file here.
 ## How to use them
 
 1. When a feature or milestone chunk is done, run **`/learning-checklist`**. It reads what actually
-   changed — including the mistakes — and writes or updates the file.
+   changed. Including the mistakes. And writes or updates the file.
 2. Work through **Hands-on** yourself, without Claude. That is the whole point.
 3. Answer the **Quiz** from memory before opening the `<details>`. A question you cannot answer is
    a concept you have not learned yet, however green the tests are.

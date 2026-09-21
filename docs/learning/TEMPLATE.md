@@ -1,4 +1,4 @@
-# NN — <Feature name>
+# NN: <Feature name>
 
 *What to learn from <feature>. Milestone <n>.*
 
@@ -11,15 +11,15 @@
 
 The 3–6 ideas this code rests on. Name them precisely.
 
-- **`<concept>`** — what it is, and what breaks without it.
-- **`<concept>`** — …
+- **`<concept>`**: what it is, and what breaks without it.
+- **`<concept>`**: …
 
 ## Docs to read
 
 Official docs first, deep-linked to the section.
 
-- [ ] [<page title>](https://docs.djangoproject.com/en/6.1/...) — <why this section>
-- [ ] [<page title>](https://docs.python.org/3/...) — <why>
+- [ ] [<page title>](https://docs.djangoproject.com/en/6.1/...). <why this section>
+- [ ] [<page title>](https://docs.python.org/3/...). <why>
 
 ## Hands-on
 
@@ -40,7 +40,7 @@ Answer from memory. Open the answer only after committing to one.
 
 ## Gotchas hit
 
-What actually went wrong while building this, and the fix. The most valuable section — fill it in
+What actually went wrong while building this, and the fix. The most valuable section. Fill it in
 even when it is embarrassing.
 
 - **<symptom>** → <cause> → <fix>

@@ -14,19 +14,19 @@ Produce or update one file per feature in `docs/learning/`, following `docs/lear
 ## Steps
 
 1. **Name the file.** `docs/learning/NN-<feature-slug>.md`, `NN` being the next free two-digit
-   number. If a file for this feature exists, **update it** — never create a duplicate.
+   number. If a file for this feature exists, **update it**. Never create a duplicate.
 2. **Look at what actually happened**, not at what was planned:
    - `git diff` / `git log` for this feature's changes
    - the files created or modified in this session
-   - any error, failed test, or wrong turn hit along the way — those are the best entries
+   - any error, failed test, or wrong turn hit along the way. Those are the best entries
 3. **Fill each section** of the template:
-   - **Concepts** — the 3–6 ideas the code depends on. Name them precisely (`select_related` vs
+   - **Concepts**: the 3–6 ideas the code depends on. Name them precisely (`select_related` vs
      `prefetch_related`, not "the ORM").
-   - **Docs to read** — real links, Django docs first, deep-linked to the section.
-   - **Hands-on** — checkboxes the user can do *without* Claude, in this repo.
-   - **Quiz** — 4–6 questions answerable from memory, no lookup. Include the answer in a
+   - **Docs to read**: real links, Django docs first, deep-linked to the section.
+   - **Hands-on**: checkboxes the user can do *without* Claude, in this repo.
+   - **Quiz**: 4–6 questions answerable from memory, no lookup. Include the answer in a
      `<details>` block so it is hidden until wanted.
-   - **Gotchas** — what actually went wrong this session, and the fix.
+   - **Gotchas**: what actually went wrong this session, and the fix.
 4. **Link it** from `docs/learning/README.md`'s index table.
 5. **Report** the path and the concept list in your reply.
 
@@ -34,8 +34,8 @@ Produce or update one file per feature in `docs/learning/`, following `docs/lear
 
 - **Specific to this repo.** "Learn about forms" is useless. "Why `clean_pseudo` strips whitespace
   before validating length, and what happens if it does not" is useful.
-- **Honest about gaps.** If a concept was used but glossed over — a decorator, a context manager,
-  a metaclass — say so and put it in the checklist. Do not hide the parts that were handed over.
+- **Honest about gaps.** If a concept was used but glossed over. A decorator, a context manager,
+  a metaclass. Say so and put it in the checklist. Do not hide the parts that were handed over.
 - **Quiz questions must have one correct answer** and be answerable from the checklist itself.
 - **Never mark a checkbox for the user.** They tick their own boxes.
 - Keep the whole file under 100 lines. A checklist nobody finishes teaches nothing.
@@ -45,14 +45,14 @@ Produce or update one file per feature in `docs/learning/`, following `docs/lear
 ```markdown
 ### Concepts
 
-- **`select_related` vs `prefetch_related`** — one SQL JOIN vs a second query plus a Python-side
+- **`select_related` vs `prefetch_related`**: one SQL JOIN vs a second query plus a Python-side
   join. Forward FK uses the first; reverse FK and M2M need the second.
-- **`transaction.atomic()`** — why `reserve_seat` wraps two writes: without it, a crash between
+- **`transaction.atomic()`**: why `reserve_seat` wraps two writes. Without it, a crash between
   them leaves a participant with no confirmation email and no way to detect it.
 
 ### Quiz
 
-1. `Participant.objects.select_related("event")` — how many queries for 20 participants?
+1. `Participant.objects.select_related("event")`: how many queries for 20 participants?
    <details><summary>Answer</summary>One. The FK is JOINed into the same query.</details>
 ```
 

@@ -1,12 +1,12 @@
 ---
 name: testing
-description: Test conventions for pykaraoke — pytest-django, fixtures vs factory-boy, what is worth testing in an MTV app, and coverage rules. Use when writing or reviewing a test, when a test is flaky or slow, when deciding what to cover for a new feature, or when asked "do I need a test for this?".
+description: Test conventions for pykaraoke. Pytest-django, fixtures vs factory-boy, what is worth testing in an MTV app, and coverage rules. Use when writing or reviewing a test, when a test is flaky or slow, when deciding what to cover for a new feature, or when asked "do I need a test for this?".
 ---
 
 # Testing (pykaraoke)
 
 `pytest` + `pytest-django` + `factory-boy`. No `unittest.TestCase`, no `django.test.TestCase`
-subclassing — plain functions and fixtures.
+subclassing. Plain functions and fixtures.
 
 ## Layout
 
@@ -18,7 +18,7 @@ tests/
   karaoke/
     test_models.py         # constraints, properties, custom QuerySets
     test_forms.py          # validation rules, error messages
-    test_services.py       # business rules — the densest file
+    test_services.py       # business rules, the densest file
     test_views.py          # status codes, redirects, template used, auth gating
 ```
 
@@ -41,7 +41,7 @@ The name is the spec. If you cannot name it this way, you do not know what you a
 - **factory-boy** builds model instances. One factory per model in `tests/factories.py`,
   `Sequence` for unique fields, `SubFactory` for FKs, traits for variants.
 - **pytest fixtures** wire the scenario (a client, a logged-in participant, a full event).
-- Never call `Model.objects.create(...)` directly in a test — go through the factory, so adding a
+- Never call `Model.objects.create(...)` directly in a test. Go through the factory, so adding a
   required field breaks one file instead of forty.
 
 ```python
@@ -56,7 +56,7 @@ class ParticipantFactory(DjangoModelFactory):
 
 ## Database access
 
-`@pytest.mark.django_db` on anything touching the ORM. Without it the test fails loudly — that is
+`@pytest.mark.django_db` on anything touching the ORM. Without it the test fails loudly. That is
 intentional, it keeps pure-logic tests fast.
 
 Use `django_assert_num_queries` to lock in query counts on overview pages:
@@ -82,14 +82,14 @@ Do not test Django. Test **your** rules.
 
 ## Coverage
 
-`--cov=. --cov-fail-under=70` in CI. Coverage is a floor, not a target — a green 70% with the
+`--cov=. --cov-fail-under=70` in CI. Coverage is a floor, not a target. A green 70% with the
 service layer untested is a failing test suite. `htmlcov/` is gitignored; run `make cov` and open
 it when a number looks wrong.
 
 ## Speed
 
 - No `time.sleep`. Freeze time with a fixture if a test depends on it.
-- No real network, no real email — `EMAIL_BACKEND` is the locmem backend under test, then assert
+- No real network, no real email. `EMAIL_BACKEND` is the locmem backend under test, then assert
   on `mail.outbox`.
 - `pytest -x -q` while iterating; the full run happens in CI.
 
@@ -98,7 +98,7 @@ it when a number looks wrong.
 1. `make test` green.
 2. A test exists that fails if the feature is reverted.
 3. Every domain exception has a test that triggers it.
-4. `docs/learning/` checklist updated — see skill `learning-checklist`.
+4. `docs/learning/` checklist updated. See skill `learning-checklist`.
 
 ## See also
 

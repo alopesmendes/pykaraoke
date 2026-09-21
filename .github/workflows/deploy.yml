@@ -11,13 +11,12 @@ permissions:
 concurrency:
   group: deploy-${{ github.ref }}
   # No cancel-in-progress: a half-cancelled deploy is worse than a wasted
-  # minute — see the github-actions skill.
+  # minute. See the github-actions skill.
 
 jobs:
   # Reusable-workflow calls, not duplicated steps: lint.yml / test.yml stay
-  # the one place that defines "lint passes" / "tests pass". This gates the
-  # build regardless of whether branch protection is ever configured on
-  # master — see docs/learning/00-milestone-0-foundation.md, chunk 7.
+  # the one place that defines "passes". Gates the build regardless of
+  # whether branch protection is configured on master.
   lint:
     uses: ./.github/workflows/lint.yml
 
@@ -66,17 +65,15 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  # Nothing wired to a host yet — that decision lands in Milestone 3 (see
-  # the devops skill's "Deploy skeleton" section). Only these two steps
-  # should need editing once a provider is chosen; changes anywhere else in
-  # this pipeline are a smell.
+  # Nothing wired to a host yet. Provider decision lands in Milestone 3, see
+  # the devops skill's "Deploy skeleton" section.
   deploy-staging:
     needs: build
     runs-on: ubuntu-latest
     environment:
       name: staging
     steps:
-      - name: TODO — deploy to staging
+      - name: "TODO: deploy to staging"
         run: echo "Would deploy ${{ needs.build.outputs.image }} to staging"
 
   deploy-production:
@@ -85,5 +82,5 @@ jobs:
     environment:
       name: production
     steps:
-      - name: TODO — deploy to production
+      - name: "TODO: deploy to production"
         run: echo "Would deploy ${{ needs.build.outputs.image }} to production"

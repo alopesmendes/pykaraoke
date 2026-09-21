@@ -39,7 +39,7 @@ sequenceDiagram
 
 Rules:
 
-- Tokens are `secrets.token_urlsafe(32)` — never a sequential id, never derived from event data.
+- Tokens are `secrets.token_urlsafe(32)`. Never a sequential id, never derived from event data.
 - Lookups use a constant-time comparison; a timing difference is a slow token oracle.
 - An unknown, expired, or unauthorised token gets **404, not 403**. A 403 confirms the event exists.
 - **Every state-changing request re-checks the token server-side.** The session identifies which
@@ -67,7 +67,7 @@ on every push.
 | `SECURE_CONTENT_TYPE_NOSNIFF` | `True` |
 | `CSRF_TRUSTED_ORIGINS` | the real origins |
 
-CSRF protection is on for every POST — the confirmation modal submits a real form with
+CSRF protection is on for every POST. The confirmation modal submits a real form with
 `{% csrf_token %}`, not a link.
 
 ## Personal data
@@ -92,7 +92,7 @@ Rules:
 | `AccessLink.token` | `expires_at` | purge job blanks the token |
 | `Participant.full_name`, `.contact` | `starts_at` + 7 days | purge job |
 | `SongRequest` rows | `starts_at` + 7 days | purge job |
-| `pseudo`, `status`, counts | kept — no longer personal once names are gone | — |
+| `pseudo`, `status`, counts | kept, no longer personal once names are gone | n/a |
 
 The purge is a Django management command (`purge_expired_data`) run on a schedule by the platform's
 cron. It is idempotent and logs counts, never values.
@@ -105,7 +105,7 @@ cron. It is idempotent and logs counts, never values.
 - Real values live in GitHub environment secrets and the platform's secret store.
 - `.claude/settings.json` denies `Read(./.env)` and `Read(./.env.*)`, so Claude never sees them.
 - `detect-private-key` runs in pre-commit; `bandit` and `pip-audit` run in `security.yml`.
-- A leaked secret is rotated first and cleaned from history second — rotation is what actually
+- A leaked secret is rotated first and cleaned from history second. Rotation is what actually
   fixes it.
 
 ## Abuse
@@ -118,7 +118,7 @@ cron. It is idempotent and logs counts, never values.
 
 ## Dependencies
 
-- `uv.lock` is committed — CI installs with `--locked`, so a compromised upstream release cannot
+- `uv.lock` is committed. CI installs with `--locked`, so a compromised upstream release cannot
   silently enter a build.
 - `pip-audit` runs on every push and weekly on a schedule.
 - Dependency bumps go through a PR with a green pipeline. Never a direct push.

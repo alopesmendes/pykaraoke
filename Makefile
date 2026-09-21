@@ -31,20 +31,15 @@ fmt: ## Ruff check --fix + format (rewrites files)
 	uv run ruff check --fix .
 	uv run ruff format .
 
-# bandit does not auto-discover pyproject.toml — without -c it ignores
-# [tool.bandit] exclude_dirs entirely and crawls .venv's thousands of files.
-#
-# No --fail-level here: this runs against the real, local .env, where
-# DEBUG=True and a placeholder key are correct for development and produce
-# expected warnings. The strict version — --fail-level WARNING against a
-# production-shaped environment — lives in tests/test_smoke.py (via
-# pytest-env) and in security.yml (chunk 7), not in everyday local dev.
+# bandit needs -c or it ignores pyproject.toml and crawls .venv.
+# No --fail-level here: DEBUG=True locally is correct and produces expected
+# warnings. The strict check lives in tests/test_smoke.py and security.yml.
 audit: ## Security checks: bandit, pip-audit, Django's own deploy check
 	uv run bandit -qr . -c pyproject.toml
 	uv run pip-audit
 	uv run python manage.py check --deploy --tag security
 
-check: lint test audit ## The full local gate — run before every PR
+check: lint test audit ## The full local gate, run before every PR
 
 db-up: ## Start local Postgres + mailpit (docker-compose.yml, chunk 5)
 	docker compose up -d

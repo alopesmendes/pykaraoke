@@ -32,24 +32,16 @@ jobs:
       - name: Install dependencies
         run: uv sync --locked --all-groups
 
-      # -c is required: bandit ignores [tool.bandit] entirely without it and
-      # crawls .venv's thousands of files instead — see the Makefile's audit
-      # target and chunk 4's notes in docs/learning/.
+      # -c is required, or bandit ignores [tool.bandit] and crawls .venv.
       - name: Bandit
         run: uv run bandit -qr . -c pyproject.toml
 
       - name: pip-audit
         run: uv run pip-audit
 
-      # Scoped to --tag security, same as `make audit` and tests/test_smoke.py:
-      # nothing configures a real SMTP backend yet, so the unscoped --deploy
-      # check fails on mail.E001 regardless of environment (see chunk 3's
-      # notes — that check flags any dev-only mail backend, not just
-      # pytest's forced locmem). --fail-level WARNING because CI, unlike
-      # local dev, should be held to the production-shaped bar. The secret
-      # key below is the same throwaway value tests/ already uses via
-      # pytest-env — it exists only to satisfy length/entropy checks, never
-      # a real credential.
+      # Scoped to security, same as `make audit`: no real SMTP configured
+      # yet, so the unscoped check always fails on mail.E001. Secret key
+      # below is the same throwaway value tests/ uses, never a real one.
       - name: Django deploy check
         env:
           DJANGO_DEBUG: "False"

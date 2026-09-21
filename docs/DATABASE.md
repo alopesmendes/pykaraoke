@@ -52,12 +52,12 @@ The night itself. Created by the admin.
 | Field        | Type                               | Notes                                              |
 |--------------|------------------------------------|----------------------------------------------------|
 | `title`      | `CharField(120)`                   | e.g. "Karaoké du 12 septembre"                     |
-| `starts_at`  | `DateTimeField`                    | Indexed — the overview lists upcoming events first |
+| `starts_at`  | `DateTimeField`                    | Indexed: the overview lists upcoming events first  |
 | `seat_limit` | `PositiveSmallIntegerField`        | Above this, sign-ups go to the waiting list        |
 | `is_open`    | `BooleanField(default=True)`       | Admin closes sign-ups without deleting the event   |
 | `created_at` | `DateTimeField(auto_now_add=True)` |                                                    |
 
-Derived, as model properties — not stored:
+Derived, as model properties. Not stored:
 - `seats_left` = `seat_limit` − confirmed participants
 - `is_full` = `seats_left <= 0`
 
@@ -72,7 +72,7 @@ The unguessable URL that replaces authentication. One per event.
 | `expires_at` | `DateTimeField`                             | Defaults to `starts_at` + 1 day |
 
 Never a sequential id, never derived from the event's data. Rotating the token invalidates every
-copy of the old link — that is the "revoke access" mechanism.
+copy of the old link. That is the "revoke access" mechanism.
 
 ## Participant
 
@@ -83,13 +83,13 @@ One person signed up to one event.
 | `event`      | `ForeignKey(KaraokeEvent, CASCADE)`      | `related_name="participants"`                  |
 | `pseudo`     | `CharField(40)`                          | Shown publicly on the overview                 |
 | `full_name`  | `CharField(80, blank=True, default="")`  | **PII**                                        |
-| `contact`    | `CharField(120, blank=True, default="")` | **PII** — email or phone, for the confirmation |
+| `contact`    | `CharField(120, blank=True, default="")` | **PII**: email or phone, for the confirmation  |
 | `status`     | `CharField(16, choices=Status)`          | `confirmed` / `waiting` / `cancelled`          |
 | `created_at` | `DateTimeField(auto_now_add=True)`       | Decides waiting-list order                     |
 
 Constraints:
 - `UniqueConstraint(fields=["event", "pseudo"], name="unique_pseudo_per_event")`
-- `ordering = ["created_at"]` — the waiting list is first-come, first-served
+- `ordering = ["created_at"]`: the waiting list is first-come, first-served
 
 ```mermaid
 stateDiagram-v2
@@ -115,7 +115,7 @@ Songs a participant wants to sing. The "gain time choosing their songs" goal.
 | `artist`      | `CharField(120, blank=True, default="")` |                                |
 | `position`    | `PositiveSmallIntegerField(default=0)`   | The participant's own ordering |
 
-`MAX_SONGS_PER_PARTICIPANT` is enforced in `services.py`, not in the schema — it is a policy that
+`MAX_SONGS_PER_PARTICIPANT` is enforced in `services.py`, not in the schema. It is a policy that
 may change per event, not a data invariant.
 
 ## Retention
@@ -125,11 +125,11 @@ may change per event, not a data invariant.
 | `KaraokeEvent`                      | indefinitely                                  | manual admin deletion      |
 | `AccessLink`                        | `expires_at`                                  | purge job clears the token |
 | `Participant.full_name`, `.contact` | 7 days after `starts_at`                      | scheduled purge job        |
-| `Participant.pseudo`, `.status`     | kept — no longer personal once names are gone | —                          |
+| `Participant.pseudo`, `.status`     | kept, no longer personal once names are gone  | n/a                        |
 | `SongRequest`                       | 7 days after `starts_at`                      | scheduled purge job        |
 
 The purge is a management command run on a schedule. Adding a PII field without adding it to the
-purge is a security finding — see [SECURITY.md](SECURITY.md).
+purge is a security finding. See [SECURITY.md](SECURITY.md).
 
 ## Query expectations
 

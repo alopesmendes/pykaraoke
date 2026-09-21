@@ -1,6 +1,6 @@
 ---
 name: devops
-description: Local and deploy infrastructure for pykaraoke — uv, the Makefile, Docker and docker-compose, environment variables, Postgres, and the deploy skeleton. Use when changing Dockerfile or docker-compose.yml, adding an environment variable, setting up local Postgres or email, or wiring the deployment target.
+description: Local and deploy infrastructure for pykaraoke. Uv, the Makefile, Docker and docker-compose, environment variables, Postgres, and the deploy skeleton. Use when changing Dockerfile or docker-compose.yml, adding an environment variable, setting up local Postgres or email, or wiring the deployment target.
 ---
 
 # DevOps (pykaraoke)
@@ -30,8 +30,8 @@ Twelve-factor: **config comes from the environment, never from a committed file.
 | `DATABASE_URL`         | `sqlite:///db.sqlite3`   | `postgres://...` when compose is up             |
 | `EMAIL_URL`            | `smtp://localhost:1025`  | mailpit locally, real SMTP in prod              |
 
-`.env` is gitignored. `.env.example` is committed and lists every key with a safe placeholder —
-when you add a variable, add it to `.env.example` **in the same change**, or the next person
+`.env` is gitignored. `.env.example` is committed and lists every key with a safe placeholder.
+When you add a variable, add it to `.env.example` **in the same change**, or the next person
 gets a `ImproperlyConfigured` on a fresh clone.
 
 `.claude/settings.json` denies reading `.env`, so Claude never sees real values.
@@ -51,7 +51,7 @@ services:
 ```
 
 - Postgres 17 because Django 6.1 requires PostgreSQL 15+.
-- **Named volume**, not a bind mount — a bind mount on macOS is slow and permission-cursed.
+- **Named volume**, not a bind mount. A bind mount on macOS is slow and permission-cursed.
 - mailpit catches the confirmation emails and shows them at `http://localhost:8025`. No real mail
   is ever sent in development.
 - `make db-up` / `make db-down`. Data survives `down`; `docker compose down -v` wipes it.
@@ -77,16 +77,16 @@ CMD ["gunicorn", "pykaraoke.wsgi:application", "--bind", "0.0.0.0:8000"]
 ```
 
 Four things that matter:
-1. **Multi-stage** — build tools never reach the runtime image.
+1. **Multi-stage**: build tools never reach the runtime image.
 2. **Copy `pyproject.toml` + `uv.lock` before the source** so a code change does not bust the
    dependency layer.
-3. **`--no-dev`** — pytest and ruff have no business in production.
-4. **Non-root `USER`** — a container running as root is a finding, not a preference.
+3. **`--no-dev`**: pytest and ruff have no business in production.
+4. **Non-root `USER`**: a container running as root is a finding, not a preference.
 
 ## Deploy skeleton
 
 `deploy.yml` today: build the image, push to `ghcr.io/alopesmendes/pykaraoke`, then two gated jobs
-(`staging` → `production`) whose provider step is a marked `TODO`. Nothing is wired to a host yet —
+(`staging` → `production`) whose provider step is a marked `TODO`. Nothing is wired to a host yet,
 that decision lands in Milestone 3.
 
 When a provider is chosen, the only edits should be inside those two steps. If a provider needs

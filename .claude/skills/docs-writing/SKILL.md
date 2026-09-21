@@ -1,12 +1,12 @@
 ---
 name: docs-writing
-description: Documentation conventions for pykaraoke — structure, tone, tables over prose, mermaid diagram rules, and when a doc needs updating. Use when writing or editing anything under docs/, README.md, CONTRIBUTING.md, or CHANGELOG.md, when adding a diagram, or when asked whether a change needs a doc update.
+description: Documentation conventions for pykaraoke. Structure, tone, tables over prose, mermaid diagram rules, and when a doc needs updating. Use when writing or editing anything under docs/, README.md, CONTRIBUTING.md, or CHANGELOG.md, when adding a diagram, or when asked whether a change needs a doc update.
 ---
 
 # Writing docs (pykaraoke)
 
 Audience: the author, six months from now, having forgotten everything. Second audience: an agent
-loading the doc as context. Both want the same thing — **short, structured, current**.
+loading the doc as context. Both want the same thing. **Short, structured, current**.
 
 ## Shape of a doc
 
@@ -30,7 +30,7 @@ loading the doc as context. Both want the same thing — **short, structured, cu
 
 ## Mermaid
 
-Diagrams are mermaid fenced blocks — GitHub renders them natively, no images to keep in sync.
+Diagrams are mermaid fenced blocks. GitHub renders them natively, no images to keep in sync.
 
 | Situation                                | Diagram           |
 |------------------------------------------|-------------------|
@@ -49,7 +49,7 @@ flowchart LR
 
 Diagram rules:
 - **Under 12 nodes.** Past that, split it into two diagrams.
-- Label the **edges**, not just the nodes — the verb is the information.
+- Label the **edges**, not just the nodes. The verb is the information.
 - Use `<br/>` for line breaks inside a node label.
 - Do not put colors or styling in the diagram; the theme handles it.
 - No mermaid for a two-step sequence. A sentence is fine.
@@ -87,11 +87,12 @@ Never "refactored services.py". That is a commit message, not a changelog entry.
 ## Language
 
 English for all documentation, code, and commit messages. User-facing strings in the app are
-French by default (Japanese secondary) via Django i18n — that split is deliberate, see
+French by default (Japanese secondary) via Django i18n. That split is deliberate, see
 `docs/ARCHITECTURE.md`.
 
 ## See also
 
 - The diagram-heavy example to copy: `docs/AI-WORKFLOW.md`
+- Sentence-level phrasing, no em dash, comment length: skill `writing-style`
 - Doc drafting at scale: agent `doc-writer`
 - Finding the authoritative answer before writing: agent `doc-lookup`

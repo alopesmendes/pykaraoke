@@ -34,10 +34,8 @@ jobs:
           path: ~/.cache/pre-commit
           key: pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
 
-      # Runs the exact .pre-commit-config.yaml the local git hook runs — one
-      # file defines "what lint means" for both. Deliberately not the
-      # pre-commit/action marketplace action: it installs its own pre-commit
-      # via pip, bypassing the version pinned in uv.lock. This reuses that
-      # pinned version instead, so CI can never disagree with a local run.
+      # Same config the local git hook runs, so CI can never disagree with a
+      # local run. Not pre-commit/action: it installs its own pre-commit via
+      # pip, bypassing the version pinned in uv.lock.
       - name: Run pre-commit
         run: uv run pre-commit run --all-files --show-diff-on-failure

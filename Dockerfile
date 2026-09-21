@@ -1,16 +1,16 @@
 # syntax=docker/dockerfile:1
 
 # --- builder --------------------------------------------------------------
-# Has uv and a C toolchain. Never reaches the runtime image — only its
-# built .venv does. Copying pyproject.toml + uv.lock before the source means
-# a source-only change reuses this layer instead of reinstalling everything.
+# Has uv and a C toolchain. Only its built .venv reaches the runtime image.
+# Copying pyproject.toml + uv.lock before the source means a source-only
+# change reuses this layer instead of reinstalling everything.
 FROM ghcr.io/astral-sh/uv:python3.13-bookworm-slim AS builder
 WORKDIR /app
 COPY pyproject.toml uv.lock ./
 RUN uv sync --locked --no-dev --no-install-project
 
 # --- runtime ----------------------------------------------------------------
-# Plain python:slim: no uv, no compiler, no dev dependencies. Non-root user —
+# Plain python:slim: no uv, no compiler, no dev dependencies. Non-root user:
 # a container running as root is a finding, not a preference.
 FROM python:3.13-slim-bookworm AS runtime
 RUN useradd --create-home --uid 1000 app

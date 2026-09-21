@@ -1,7 +1,6 @@
 # Local gate: fast, runs on every `git commit`, skippable with --no-verify.
-# CI (lint.yml / test.yml / security.yml) is the authoritative gate that runs
-# the same checks (plus tests and the full audit) regardless of whether this
-# ran — see docs/CI-CD.md for why both exist.
+# CI runs the same checks plus tests and the full audit either way.
+# See docs/CI-CD.md for why both exist.
 repos:
   # repo: local reuses this project's own Ruff (pinned once, in pyproject.toml)
   # instead of a separately pinned mirror, so pre-commit can never disagree

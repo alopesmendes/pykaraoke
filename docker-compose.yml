@@ -1,6 +1,5 @@
-# Local dev services only — the Django app itself runs on the host via
-# `make dev`, pointed at these through DATABASE_URL / EMAIL_URL in .env.
-# `make db-up` / `make db-down`. See docs/SETUP.md for the full walkthrough.
+# Local dev services only. The app runs on the host via `make dev`, pointed
+# at these through DATABASE_URL / EMAIL_URL in .env. See docs/SETUP.md.
 services:
   postgres:
     image: postgres:17-alpine
@@ -21,8 +20,8 @@ services:
   mailpit:
     image: axllent/mailpit:v1.31.1
     ports:
-      - "1025:1025" # SMTP — point EMAIL_URL at this
-      - "8025:8025" # web UI — http://localhost:8025
+      - "1025:1025" # SMTP: point EMAIL_URL at this
+      - "8025:8025" # web UI: http://localhost:8025
 
 volumes:
   # Named volume, not a bind mount: a bind mount for Postgres data on macOS

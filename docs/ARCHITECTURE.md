@@ -22,11 +22,11 @@ The arrows only point one way. `models.py` never imports a view; `services.py` n
 ## Project layout
 
 ```
-pykaraoke/            # project package — configuration only, no features
+pykaraoke/            # project package: configuration only, no features
   settings.py         # split into base/dev/prod in Milestone 1
   urls.py             # includes karaoke.urls
   wsgi.py, asgi.py
-karaoke/              # the single app — all features live here
+karaoke/              # the single app: all features live here
   models.py           # KaraokeEvent, Participant, SongRequest, AccessLink
   managers.py         # custom QuerySets (reusable filters)
   forms.py            # input shape + field validation
@@ -39,7 +39,7 @@ karaoke/              # the single app — all features live here
   migrations/
 tests/                # mirrors the source tree
 docs/                 # this folder
-.claude/              # skills, agents, permissions — see AI-WORKFLOW.md
+.claude/              # skills, agents, permissions: see AI-WORKFLOW.md
 ```
 
 **One app, not many.** The whole domain is four models and five pages. Splitting it into
@@ -86,7 +86,7 @@ There are no user accounts. Access is a single unguessable link per event.
 ```mermaid
 flowchart TD
   A[Visitor opens link] --> B{Token valid?}
-  B -->|no| N[404 — do not leak that the event exists]
+  B -->|no| N[404: do not leak that the event exists]
   B -->|yes| C{Seats left?}
   C -->|yes| D[Confirmed]
   C -->|no| E[Waiting list]
@@ -95,14 +95,14 @@ flowchart TD
   F --> G[Can update or cancel own status]
 ```
 
-The session is a convenience so a returning visitor sees their own row highlighted — it is not a
+The session is a convenience so a returning visitor sees their own row highlighted. It is not a
 security boundary. Every state change re-checks the token server-side. Details in
 [SECURITY.md](SECURITY.md).
 
 ## Internationalisation
 
 Documentation, code and commits are in **English**. User-facing strings are **French by default**,
-with Japanese as a secondary locale — that is the audience, per the spec.
+with Japanese as a secondary locale. That is the audience, per the spec.
 
 Every visible string goes through `gettext_lazy` in Python and `{% translate %}` in templates from
 the first commit that introduces it. Retro-fitting i18n after the fact means touching every

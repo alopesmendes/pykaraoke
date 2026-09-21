@@ -1,6 +1,6 @@
 ---
 name: django-mtv
-description: Django 6.1 MTV patterns for pykaraoke — models, QuerySets, migrations, forms, views, templates, and URL naming. Use when creating or changing a model, writing a migration, building a form, adding a view or URL, editing a template, or fixing an N+1 query. Also use when choosing between a function-based and a class-based view.
+description: Django 6.1 MTV patterns for pykaraoke. Models, QuerySets, migrations, forms, views, templates, and URL naming. Use when creating or changing a model, writing a migration, building a form, adding a view or URL, editing a template, or fixing an N+1 query. Also use when choosing between a function-based and a class-based view.
 ---
 
 # Django MTV (pykaraoke)
@@ -57,7 +57,7 @@ class ParticipantQuerySet(models.QuerySet):
 - `select_related` for forward FK / one-to-one. `prefetch_related` for reverse FK / M2M.
 - Django 6.1 adds **fetch modes**: `.fetch_mode(models.FETCH_PEERS)` makes an unfetched field
   access load that field for every instance from the same queryset in one query. Good safety net
-  for templates, **not** a replacement for `select_related` — reach for it when a template
+  for templates, **not** a replacement for `select_related`. Reach for it when a template
   touches a field you did not plan for.
 - Set `DEBUG_TOOLBAR` query count as the check: an overview page must be O(1) queries, not O(n).
 
@@ -66,7 +66,7 @@ class ParticipantQuerySet(models.QuerySet):
 - One migration per logical change; run `python manage.py makemigrations` and **read the file**
   before committing.
 - Never edit an applied migration. Add a new one.
-- Data migrations get `RunPython(forward, reverse)` — always supply the reverse.
+- Data migrations get `RunPython(forward, reverse)`. Always supply the reverse.
 - `python manage.py makemigrations --check --dry-run` runs in CI: a model change without a
   migration fails the build.
 
@@ -88,7 +88,7 @@ class SignUpForm(forms.ModelForm):
 ```
 
 - `clean_<field>` for one field, `clean()` for cross-field rules.
-- Never trust a hidden field for identity — the event comes from the URL, not the POST body.
+- Never trust a hidden field for identity. The event comes from the URL, not the POST body.
 - Every user-facing string wrapped in `gettext_lazy as _` (FR is the default locale).
 
 ## Views
@@ -124,7 +124,7 @@ def sign_up(request: HttpRequest, token: str) -> HttpResponse:
 | `karaoke:overview` | `<str:token>/`                             |
 | `karaoke:cancel`   | `<str:token>/cancel/<int:participant_id>/` |
 
-Routes are specified in `docs/API.md` — update it in the same change.
+Routes are specified in `docs/API.md`. Update it in the same change.
 
 ## Templates
 

@@ -12,7 +12,7 @@ Entries are written for someone **using** the site, not for someone reading the 
 ### Added
 - Project documentation: architecture, database, API, security, epics.
 - Learning checklists under `docs/learning/`, one per feature.
-- Claude Code workflow: 8 skills, 9 agents, committed permissions, auto-format hook.
+- Claude Code workflow: 9 skills, 9 agents, committed permissions, auto-format hook.
 - GitHub issue and pull request templates.
 
 [Unreleased]: https://github.com/alopesmendes/pykaraoke/commits/master

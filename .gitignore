@@ -54,5 +54,5 @@ db.sqlite3-journal
 .coverage
 htmlcov/
 
-# Claude Code — personal overrides, never shared
+# Claude Code: personal overrides, never shared
 .claude/settings.local.json

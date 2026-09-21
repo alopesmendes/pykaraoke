@@ -34,7 +34,7 @@ dev = [
 package = false
 
 # ---------------------------------------------------------------------------
-# Ruff — the only linter and formatter. No Black, no Flake8, no isort.
+# Ruff: the only linter and formatter. No Black, no Flake8, no isort.
 # ---------------------------------------------------------------------------
 [tool.ruff]
 line-length = 100
@@ -45,10 +45,10 @@ extend-exclude = ["**/migrations/**"]
 select = [
     "E",   # pycodestyle
     "F",   # Pyflakes
-    "I",   # isort — import ordering
+    "I",   # isort: import ordering
     "UP",  # pyupgrade
-    "B",   # bugbear — mutable defaults, silent except
-    "S",   # flake8-bandit — fast security feedback on every edit
+    "B",   # bugbear: mutable defaults, silent except
+    "S",   # flake8-bandit: fast security feedback on every edit
     "DJ",  # flake8-django
     "C4",  # comprehensions
     "SIM", # simplify
@@ -62,7 +62,7 @@ select = [
 known-first-party = ["pykaraoke", "karaoke"]
 
 # ---------------------------------------------------------------------------
-# pytest — coverage flags live in the Makefile and CI, not here, so that
+# pytest. Coverage flags live in the Makefile and CI, not here, so that
 # `pytest -x` stays fast while iterating.
 # ---------------------------------------------------------------------------
 [tool.pytest.ini_options]
@@ -70,10 +70,8 @@ DJANGO_SETTINGS_MODULE = "pykaraoke.settings"
 python_files = ["test_*.py"]
 testpaths = ["tests"]
 addopts = ["-ra", "--strict-markers", "--strict-config"]
-# pytest-env sets these before Django imports settings.py, so the test suite
-# never depends on the developer's real .env. This key is a random throwaway,
-# never used outside the test session — it satisfies check --deploy's length
-# and entropy warnings without being an actual secret.
+# pytest-env sets these before settings.py loads, so tests never depend on
+# the real .env. This key is a random throwaway, never a real secret.
 env = [
     "DJANGO_DEBUG=False",
     "DJANGO_SECRET_KEY=LoGfWyqNt1XvFHL13638FhEjHLTKcrUwIyqqAaT-lrp97qUsC_S7Un3QyQVVHJr9fOc",
@@ -81,8 +79,8 @@ env = [
 ]
 
 [tool.coverage.run]
-# "karaoke" is added back once Milestone 1 creates that app — coverage.py
-# warns on every run for a source package that was never imported.
+# "karaoke" comes back once Milestone 1 creates that app: coverage.py warns
+# on a source package that was never imported.
 source = ["pykaraoke"]
 omit = ["*/migrations/*", "*/tests/*", "*/wsgi.py", "*/asgi.py", "manage.py"]
 

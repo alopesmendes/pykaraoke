@@ -8,12 +8,12 @@ Everything lives in `.claude/`. Three surfaces, one rule set.
 
 | Surface   | What it is                                                   | Where                            | Loaded                                                         |
 |-----------|--------------------------------------------------------------|----------------------------------|----------------------------------------------------------------|
-| **Skill** | Reusable knowledge — this project's conventions for a topic  | `.claude/skills/<name>/SKILL.md` | On demand, into the main conversation                          |
+| **Skill** | Reusable knowledge: this project's conventions for a topic   | `.claude/skills/<name>/SKILL.md` | On demand, into the main conversation                          |
 | **Agent** | A worker with its own fresh context and a restricted toolset | `.claude/agents/<name>.md`       | When delegated to; its output comes back, its context does not |
 | **Rule**  | Enforced by the harness, not by the model                    | `.claude/settings.json`          | Always                                                         |
 
 The difference that matters: a **skill** changes how Claude works. An **agent** does a job
-somewhere else and reports back — use one when the job would flood the conversation with files.
+somewhere else and reports back. Use one when the job would flood the conversation with files.
 A **rule** is the only one the model cannot talk its way past.
 
 ## The feature loop
@@ -62,7 +62,7 @@ flowchart TD
   L --> L1["/learning-checklist<br/>→ agent verifier"]
 ```
 
-Unsure whether a library behaves the way you remember? **agent `doc-lookup`** — it cites the
+Unsure whether a library behaves the way you remember? **agent `doc-lookup`** cites the
 version-pinned page instead of guessing.
 
 ## Skills
@@ -70,13 +70,14 @@ version-pinned page instead of guessing.
 | Skill                | Use it for                                                           |
 |----------------------|----------------------------------------------------------------------|
 | `python-standards`   | Type hints, early returns, naming, exceptions, why a Ruff rule is on |
-| `django-mtv`         | Models, QuerySets, migrations, fo rms, views, URLs, templates, N+1   |
-| `clean-architecture` | Where a piece of logic belongs; when **not** to abstract             |
+| `django-mtv`         | Models, QuerySets, migrations, forms, views, URLs, templates, N+1    |
+| `clean-architecture` | Where a piece of logic belongs, when **not** to abstract             |
 | `testing`            | pytest-django, factories, what is worth testing, coverage            |
 | `github-actions`     | Workflow anatomy, uv caching, service containers, environments       |
 | `devops`             | uv, Makefile, Docker, env vars, Postgres, deploy skeleton            |
 | `docs-writing`       | Doc structure, mermaid rules, which doc owns which change            |
-| `learning-checklist` | `/learning-checklist` — the retention step at the end of a feature   |
+| `writing-style`      | Why/how/what phrasing, no em dash, short code comments               |
+| `learning-checklist` | `/learning-checklist`, the retention step at the end of a feature    |
 
 ## Agents
 
@@ -92,7 +93,7 @@ version-pinned page instead of guessing.
 | `frontend-patterns` | Templates, forms, toaster, modal, i18n, a11y          | sonnet |
 | `security-reviewer` | Django security, OWASP basics, PII policy             | opus   |
 
-Read-only reviewers run in plan mode — they cannot edit. `doc-writer`, `api-designer` and
+Read-only reviewers run in plan mode. They cannot edit. `doc-writer`, `api-designer` and
 `eval-harness` keep project memory, so conventions accumulate across sessions.
 
 ## Rules
@@ -124,7 +125,7 @@ sequenceDiagram
 | **deny** `git reset --hard`, `git rebase`                              | History loss is unrecoverable from inside a session. |
 | **deny** `rm -rf`                                                      | Same.                                                |
 | **deny** `Read(./.env*)`                                               | Claude never sees real secrets.                      |
-| **ask** `gh pr create`, `gh release`                                   | Outward-facing — you confirm each one.               |
+| **ask** `gh pr create`, `gh release`                                   | Outward-facing. You confirm each one.                |
 | **allow** `uv`, `make`, `manage.py`, `ruff`, `pytest`, read-only `git` | Project-scoped, reversible, runs unattended.         |
 
 A `PostToolUse` hook runs `ruff format` + `ruff check --fix` on every Python file Claude edits, so
@@ -133,7 +134,7 @@ formatting never reaches review. It no-ops silently until `uv` and `pyproject.to
 ## Adding a skill or an agent
 
 1. **Skill** → `.claude/skills/<name>/SKILL.md`; **agent** → `.claude/agents/<name>.md`.
-2. Frontmatter: `name` + `description`. The description is a **trigger**, not a summary — lead
+2. Frontmatter: `name` + `description`. The description is a **trigger**, not a summary. Lead
    with the phrases you would actually type ("when creating a model", "when CI is red"). Under
    1536 characters.
 3. **Hard cap: 200 lines.** A skill nobody reads to the end is a skill that does not work. Move
@@ -141,7 +142,7 @@ formatting never reaches review. It no-ops silently until `uv` and `pyproject.to
 4. Project-specific beats generic. "Use `select_related` for forward FKs" is worth writing;
    "Django is a web framework" is not.
 5. Agents get a `tools` allowlist. Reviewers get `permissionMode: plan`.
-6. Register it in [`CLAUDE.md`](../CLAUDE.md) and in the tables above — an unregistered skill is
+6. Register it in [`CLAUDE.md`](../CLAUDE.md) and in the tables above. An unregistered skill is
    one Claude will not find.
 
 Verify with `claude doctor`, then `/skills` and `/agents`.

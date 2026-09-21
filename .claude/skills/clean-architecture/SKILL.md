@@ -1,6 +1,6 @@
 ---
 name: clean-architecture
-description: Decide where code belongs in pykaraoke — model method, custom QuerySet, services.py, form, or view. Use when adding business logic, when a view is getting long, when tempted to add a new layer or abstraction, or when asked "where should this go?" / "should I extract this?". Covers DDD-lite in Django MTV and when NOT to abstract.
+description: Decide where code belongs in pykaraoke. Model method, custom QuerySet, services.py, form, or view. Use when adding business logic, when a view is getting long, when tempted to add a new layer or abstraction, or when asked "where should this go?" / "should I extract this?". Covers DDD-lite in Django MTV and when NOT to abstract.
 ---
 
 # Clean architecture, Django-sized (pykaraoke)
@@ -85,7 +85,7 @@ Diagnose before refactoring:
 ## Migration path (documented, not built)
 
 If this app ever grows past ~15 models or gains a second delivery channel (an API, a bot), the
-next step is one package per bounded context (`events/`, `songs/`) — still Django apps, still
+next step is one package per bounded context (`events/`, `songs/`). Still Django apps, still
 this same service layer. Do not pre-build it.
 
 ## See also
