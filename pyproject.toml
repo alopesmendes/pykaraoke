@@ -66,14 +66,15 @@ known-first-party = ["pykaraoke", "karaoke"]
 # `pytest -x` stays fast while iterating.
 # ---------------------------------------------------------------------------
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "pykaraoke.settings"
+# prod.py, not dev.py: the suite is the guardrail that catches a security
+# regression before it ships, so it runs against the strict settings.
+DJANGO_SETTINGS_MODULE = "pykaraoke.settings.prod"
 python_files = ["test_*.py"]
 testpaths = ["tests"]
 addopts = ["-ra", "--strict-markers", "--strict-config"]
 # pytest-env sets these before settings.py loads, so tests never depend on
 # the real .env. This key is a random throwaway, never a real secret.
 env = [
-    "DJANGO_DEBUG=False",
     "DJANGO_SECRET_KEY=LoGfWyqNt1XvFHL13638FhEjHLTKcrUwIyqqAaT-lrp97qUsC_S7Un3QyQVVHJr9fOc",
     "DJANGO_ALLOWED_HOSTS=testserver",
 ]

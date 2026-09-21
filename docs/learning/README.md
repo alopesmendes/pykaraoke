@@ -19,6 +19,7 @@ feature. Every feature gets one file here.
 | #  | Checklist                                                   | Milestone | Status      |
 |----|-------------------------------------------------------------|-----------|-------------|
 | 00 | [Foundation & infrastructure](00-milestone-0-foundation.md) | 0         | in progress |
+| 01 | [Settings split by environment](01-settings-split.md)       | 1         | in progress |
 
 New entries are appended here by `/learning-checklist`.
 

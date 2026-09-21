@@ -19,5 +19,6 @@ COPY --from=builder --chown=app:app /app/.venv /app/.venv
 COPY --chown=app:app . /app
 USER app
 ENV PATH="/app/.venv/bin:$PATH"
+ENV DJANGO_SETTINGS_MODULE="pykaraoke.settings.prod"
 EXPOSE 8000
 CMD ["gunicorn", "pykaraoke.wsgi:application", "--bind", "0.0.0.0:8000"]
