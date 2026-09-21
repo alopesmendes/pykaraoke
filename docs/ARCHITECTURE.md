@@ -23,7 +23,10 @@ The arrows only point one way. `models.py` never imports a view; `services.py` n
 
 ```
 pykaraoke/            # project package: configuration only, no features
-  settings.py         # split into base/dev/prod in Milestone 1
+  settings/
+    base.py           # shared, environment-agnostic settings
+    dev.py            # DEBUG = True, security settings relaxed
+    prod.py           # DEBUG = False, every security setting on
   urls.py             # includes karaoke.urls
   wsgi.py, asgi.py
 karaoke/              # the single app: all features live here

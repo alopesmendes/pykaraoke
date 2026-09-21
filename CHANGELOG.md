@@ -16,4 +16,8 @@ Entries are written for someone **using** the site, not for someone reading the 
 - GitHub issue and pull request templates.
 - `karaoke` app scaffolded and registered (empty, no behaviour yet).
 
+### Changed
+- Settings split into `pykaraoke/settings/{base,dev,prod}.py`; `DEBUG` and the security
+  block are hardcoded per environment instead of read from `DJANGO_DEBUG`.
+
 [Unreleased]: https://github.com/alopesmendes/pykaraoke/commits/master
