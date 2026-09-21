@@ -14,5 +14,6 @@ Entries are written for someone **using** the site, not for someone reading the 
 - Learning checklists under `docs/learning/`, one per feature.
 - Claude Code workflow: 9 skills, 9 agents, committed permissions, auto-format hook.
 - GitHub issue and pull request templates.
+- `karaoke` app scaffolded and registered (empty, no behaviour yet).
 
 [Unreleased]: https://github.com/alopesmendes/pykaraoke/commits/master
