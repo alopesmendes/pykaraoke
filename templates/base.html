@@ -1,0 +1,17 @@
+{% load i18n %}{% get_current_language as LANGUAGE_CODE %}<!doctype html>
+<html lang="{{ LANGUAGE_CODE }}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{% translate "pykaraoke" %}{% endblock %}</title>
+  </head>
+  <body>
+    <div id="toaster" class="toaster" aria-live="polite"></div>
+
+    <main>
+      {% block content %}{% endblock %}
+    </main>
+
+    <div id="modal-container"></div>
+  </body>
+</html>

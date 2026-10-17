@@ -29,6 +29,7 @@ pykaraoke/            # project package: configuration only, no features
     prod.py           # DEBUG = False, every security setting on
   urls.py             # includes karaoke.urls
   wsgi.py, asgi.py
+templates/            # project-wide shell: base.html (content block, toaster, modal)
 karaoke/              # the single app: all features live here
   models.py           # KaraokeEvent, Participant, SongRequest, AccessLink
   managers.py         # custom QuerySets (reusable filters)
