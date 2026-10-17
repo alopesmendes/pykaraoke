@@ -16,4 +16,18 @@ Entries are written for someone **using** the site, not for someone reading the 
 - GitHub issue and pull request templates.
 - `karaoke` app scaffolded and registered (empty, no behaviour yet).
 
+### Changed
+- Settings split into `pykaraoke/settings/{base,dev,prod}.py`; `DEBUG` and the security
+  block are hardcoded per environment instead of read from `DJANGO_DEBUG`.
+
+### Security
+- Dependencies `urllib3` (2.8.0) and `virtualenv` (21.14.10) upgraded to clear 11 known
+  vulnerabilities reported by `pip-audit`.
+
+### Fixed
+- Lint and security workflows failed at dependency install because `uv` picked Python 3.15. They
+  now pin Python 3.13, matching the Docker image.
+- Security workflow ran the Django deploy check against the dev settings and failed on HTTPS and
+  `DEBUG` warnings. It now runs against `pykaraoke.settings.prod`.
+
 [Unreleased]: https://github.com/alopesmendes/pykaraoke/commits/master

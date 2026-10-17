@@ -30,7 +30,9 @@ it).
 
 1. **Checkout**: clones the repo at the triggering commit.
 2. **Install uv** (`astral-sh/setup-uv@v10.1.0`). Installs `uv` itself and restores its
-   dependency cache, keyed on `uv.lock`.
+   dependency cache, keyed on `uv.lock`. `python-version: "3.13"` is pinned (same in
+   `security.yml`): unpinned, `uv` picks the newest CPython, and `psycopg-binary` has no wheel for
+   3.15, so `uv sync --locked` fails.
 3. **Install dependencies**: `uv sync --locked --all-groups`. `--locked` fails the job outright
    if `uv.lock` doesn't match `pyproject.toml`, rather than silently re-resolving.
 4. **Cache pre-commit hook environments**: restores `~/.cache/pre-commit`, keyed on
@@ -65,9 +67,12 @@ activity.
 4. **Bandit**: `uv run bandit -qr . -c pyproject.toml`. The `-c` is required, or bandit ignores
    `[tool.bandit]` entirely and crawls `.venv`'s thousands of files instead of the real source.
 5. **pip-audit**: checks every locked dependency against known vulnerability databases.
-6. **Django deploy check**: `manage.py check --deploy --tag security --fail-level WARNING`, under
-   throwaway production-shaped env vars (not real secrets. Just values that satisfy the checks'
-   length/entropy/non-empty requirements). Scoped to the `security` tag because nothing configures
+6. **Django deploy check**: `manage.py check --deploy --tag security --fail-level WARNING`, with
+   `DJANGO_SETTINGS_MODULE=pykaraoke.settings.prod` and throwaway env vars (not real secrets. Just
+   values that satisfy the checks' length/entropy/non-empty requirements). The settings module must
+   be named explicitly: `manage.py` defaults to `settings.dev`, which has `DEBUG=True` and no
+   HTTPS settings, so the check would fail on `security.W004`, `W008`, `W012`, `W016` and `W018`.
+   `make audit` runs the same check against dev and tolerates those warnings. Scoped to the `security` tag because nothing configures
    a real SMTP backend yet; the unscoped `--deploy` check would fail on `mail.E001` regardless of
    environment.
 

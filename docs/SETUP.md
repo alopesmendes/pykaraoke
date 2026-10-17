@@ -38,13 +38,17 @@ already has a working local default:
 | Variable | Default | Change it when |
 |---|---|---|
 | `DJANGO_SECRET_KEY` | `change-me` (must replace) | never commit a real one, dev-only |
-| `DJANGO_DEBUG` | `True` | never, for local dev |
 | `DJANGO_ALLOWED_HOSTS` | `localhost,127.0.0.1` | rarely, for local dev |
 | `DATABASE_URL` | blank → SQLite | you want Postgres, see step 5 |
 | `EMAIL_URL` | blank → console backend | you want mailpit, see step 5 |
 
 `.env` is gitignored and `.claude/settings.json` denies Claude from ever reading it. Real
 secrets never need to pass through an AI session.
+
+`DEBUG` is no longer an env var: `manage.py` defaults `DJANGO_SETTINGS_MODULE` to
+`pykaraoke.settings.dev`, `wsgi.py`/`asgi.py` (the deploy entrypoints) default to `.prod`, and
+DEBUG is hardcoded in whichever one loads. Override `DJANGO_SETTINGS_MODULE` yourself only to
+run one against the other's settings on purpose.
 
 ## 3. Install
 
