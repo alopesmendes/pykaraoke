@@ -10,7 +10,8 @@ server-rendered MTV, no SPA, no REST API.
 
 ## Hard rules
 
-1. **Never `git commit` or `git push`.** Denied in `.claude/settings.json`. The human commits.
+1. **`git commit`, `git push` and `gh pr create` are allowed** in `.claude/settings.json`.
+   History rewrites (`reset --hard`, `rebase`) stay denied.
 2. **Never read `.env`.** Denied. Use `.env.example` to learn the keys.
 3. **Business logic goes in `services.py`**, never in a view or a template.
 4. **Every behaviour change updates the doc that owns it**: see the table in the `docs-writing`
