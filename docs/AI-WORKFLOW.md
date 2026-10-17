@@ -108,9 +108,9 @@ sequenceDiagram
   C->>H: tool call
   H->>H: deny → ask → allow, first match wins
   alt matches deny
-    H-->>C: refused (git commit, git push, rm -rf, read .env)
+    H-->>C: refused (git reset --hard, git rebase, rm -rf, read .env)
   else matches ask
-    H->>U: prompt (gh pr create, gh release)
+    H->>U: prompt (gh release)
     U-->>H: yes / no
   else matches allow
     H-->>C: runs (uv, make, manage.py, ruff, pytest, read-only git)
@@ -121,11 +121,11 @@ sequenceDiagram
 
 | Rule                                                                   | Why                                                  |
 |------------------------------------------------------------------------|------------------------------------------------------|
-| **deny** `git commit`, `git push`                                      | Committing is a human decision. Non-negotiable.      |
 | **deny** `git reset --hard`, `git rebase`                              | History loss is unrecoverable from inside a session. |
 | **deny** `rm -rf`                                                      | Same.                                                |
 | **deny** `Read(./.env*)`                                               | Claude never sees real secrets.                      |
-| **ask** `gh pr create`, `gh release`                                   | Outward-facing. You confirm each one.                |
+| **ask** `gh release`                                                   | Outward-facing. You confirm each one.                |
+| **allow** `git commit`, `git push`, `gh pr create`                     | Lets Claude finish a feature and open its PR.        |
 | **allow** `uv`, `make`, `manage.py`, `ruff`, `pytest`, read-only `git` | Project-scoped, reversible, runs unattended.         |
 
 A `PostToolUse` hook runs `ruff format` + `ruff check --fix` on every Python file Claude edits, so
