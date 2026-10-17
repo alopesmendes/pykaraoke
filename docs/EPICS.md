@@ -52,7 +52,7 @@ full gotcha list is in `docs/learning/00-milestone-0-foundation.md`.
 - [ ] Settings split: `settings/base.py`, `dev.py`, `prod.py`
 - [ ] Wire PostgreSQL via `DATABASE_URL`
 - [ ] Create the layer files: `services.py`, `exceptions.py`, `managers.py`
-- [ ] `templates/base.html` with content block, toaster region, modal container
+- [x] `templates/base.html` with content block, toaster region, modal container
 - [ ] i18n setup: `LANGUAGE_CODE = "fr"`, `LANGUAGES = [fr, ja]`, `locale/` directory
 - [ ] Static files pipeline (WhiteNoise)
 - [ ] `tests/factories.py` scaffold + `conftest.py` fixtures
