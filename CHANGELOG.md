@@ -15,6 +15,8 @@ Entries are written for someone **using** the site, not for someone reading the 
 - Claude Code workflow: 9 skills, 9 agents, committed permissions, auto-format hook.
 - GitHub issue and pull request templates.
 - `karaoke` app scaffolded and registered (empty, no behaviour yet).
+- Site languages: French by default, Japanese available. The browser's language picks which one
+  is shown. No page is translated yet.
 
 ### Changed
 - Settings split into `pykaraoke/settings/{base,dev,prod}.py`; `DEBUG` and the security
