@@ -25,6 +25,8 @@ Entries are written for someone **using** the site, not for someone reading the 
   vulnerabilities reported by `pip-audit`.
 
 ### Fixed
+- Lint and security workflows failed at dependency install because `uv` picked Python 3.15. They
+  now pin Python 3.13, matching the Docker image.
 - Security workflow ran the Django deploy check against the dev settings and failed on HTTPS and
   `DEBUG` warnings. It now runs against `pykaraoke.settings.prod`.
 

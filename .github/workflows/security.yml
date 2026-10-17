@@ -26,6 +26,8 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v10.1.0
         with:
+          # Pinned: see lint.yml. 3.13 matches the Dockerfile.
+          python-version: "3.13"
           enable-cache: true
           cache-dependency-glob: "uv.lock"
 

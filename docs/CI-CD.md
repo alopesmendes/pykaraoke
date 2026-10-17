@@ -30,7 +30,9 @@ it).
 
 1. **Checkout**: clones the repo at the triggering commit.
 2. **Install uv** (`astral-sh/setup-uv@v10.1.0`). Installs `uv` itself and restores its
-   dependency cache, keyed on `uv.lock`.
+   dependency cache, keyed on `uv.lock`. `python-version: "3.13"` is pinned (same in
+   `security.yml`): unpinned, `uv` picks the newest CPython, and `psycopg-binary` has no wheel for
+   3.15, so `uv sync --locked` fails.
 3. **Install dependencies**: `uv sync --locked --all-groups`. `--locked` fails the job outright
    if `uv.lock` doesn't match `pyproject.toml`, rather than silently re-resolving.
 4. **Cache pre-commit hook environments**: restores `~/.cache/pre-commit`, keyed on

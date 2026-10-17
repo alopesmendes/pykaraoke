@@ -68,6 +68,9 @@
 - **CI deploy check showed W004, W008, W012, W016, W018** → `security.yml` still set the old
   `DJANGO_DEBUG=False`, which nothing reads now, and `manage.py` defaulted to dev → set
   `DJANGO_SETTINGS_MODULE: pykaraoke.settings.prod` in the step.
+- **Lint and security jobs failed at `uv sync --locked`** (`psycopg-binary` has no `cp315`
+  wheel) → those jobs did not set `python-version`, so `uv` took the newest CPython → pinned
+  `"3.13"` in both, like the Dockerfile.
 - **`make audit` still prints those warnings** → it runs on dev, on purpose → not a bug.
 
 ## Still unclear
