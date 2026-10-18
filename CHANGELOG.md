@@ -11,7 +11,8 @@ Entries are written for someone **using** the site, not for someone reading the 
 
 ### Added
 - Project documentation: architecture, database, API, security, epics.
-- Learning checklists under `docs/learning/`, one per feature.
+- Learning checklists under `docs/learning/`, one per feature. Milestone 1 checklist added
+  (app skeleton, settings split, Postgres, base template, i18n).
 - Claude Code workflow: 9 skills, 9 agents, committed permissions, auto-format hook.
 - GitHub issue and pull request templates.
 - `karaoke` app scaffolded and registered (empty, no behaviour yet).

@@ -23,6 +23,7 @@ feature. Every feature gets one file here.
 | 02 | [Base template and template directory](02-base-template.md) | 1         | in progress |
 | 03 | [i18n setup: fr default, ja secondary](03-i18n-setup.md)    | 1         | in progress |
 | 04 | [Wire PostgreSQL via DATABASE_URL](04-postgres-database-url.md) | 0     | in progress |
+| 05 | [Milestone 1 close-out: an empty app that boots](05-milestone-1-architecture.md) | 1 | in progress |
 
 New entries are appended here by `/learning-checklist`.
 
