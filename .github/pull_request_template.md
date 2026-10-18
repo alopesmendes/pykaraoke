@@ -1,8 +1,22 @@
-## What
+## Goal
+<!-- What this PR does. For a sub-PR, state this PR's piece, not the parent issue. -->
 
-## Why
+## Description
+<!-- How it works, in a few lines. -->
 
-## Checklist
+## Accept criteria
+- [ ]
+
+## Tests
+<!-- Write the tests before the code. Tick each one as it passes. -->
 - [ ] `make check` passes
-- [ ] Docs updated (if behaviour changed)
-- [ ] Learning checklist updated (`docs/learning/`)
+- [ ]
+
+## Architecture schema
+<!-- Mermaid diagram of the parts touched, or "none". -->
+
+## Libraries / dependencies
+<!-- New or upgraded packages and why, or "none". -->
+
+## Additional information / Web
+<!-- Links, screenshots, related issues: closes #, refs #. -->

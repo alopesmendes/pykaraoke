@@ -1,12 +1,27 @@
 ---
 name: Bug
-about: Something is broken
+about: Something is broken. The spec for the fix.
 labels: bug
 ---
 
-**What broke**
+## Goal
+<!-- What should work once this is fixed. -->
 
-**Steps to reproduce**
-1.
+## Requirements
+- [ ] Reproduce the bug with a failing test before fixing it
 
-**Expected**
+## Design / Architecture
+<!-- Where the cause probably lives, if known. -->
+
+## Constraints solved
+| Constraint | Met by |
+|------------|--------|
+|            |        |
+
+## Open Questions
+<!-- Decisions still open. Delete the section if there are none. -->
+-
+
+## Areas of concern
+<!-- Steps to reproduce, what was seen versus expected, and who is affected. -->
+-

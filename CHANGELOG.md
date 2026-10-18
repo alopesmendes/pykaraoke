@@ -15,6 +15,10 @@ Entries are written for someone **using** the site, not for someone reading the 
   (app skeleton, settings split, Postgres, base template, i18n).
 - Claude Code workflow: 9 skills, 9 agents, committed permissions, auto-format hook.
 - GitHub issue and pull request templates.
+- Spec-driven GitHub setup: issue templates hold the spec (goal, requirements, design, open
+  questions), the pull request template holds the plan (accept criteria, tests, architecture).
+  Status and area labels added. The label scheme and the issue-to-draft-PR rule are in
+  `docs/AI-WORKFLOW.md`.
 - `karaoke` app scaffolded and registered (empty, no behaviour yet).
 - Site languages: French by default, Japanese available. The browser's language picks which one
   is shown. No page is translated yet.
