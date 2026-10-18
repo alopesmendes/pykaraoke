@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help install dev migrate superuser test cov lint fmt audit check db-up db-down clean
+.PHONY: help install dev migrate superuser collectstatic test cov lint fmt audit check db-up db-down clean
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*## ' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*## "}; {printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2}'
@@ -16,6 +16,11 @@ migrate: ## Apply database migrations
 
 superuser: ## Create a Django admin superuser
 	uv run python manage.py createsuperuser
+
+# Prod settings on purpose: the manifest storage only behaves like production
+# when DEBUG is off. Output goes to staticfiles/, which is gitignored.
+collectstatic: ## Collect static files into staticfiles/ (WhiteNoise serves them)
+	DJANGO_SETTINGS_MODULE=pykaraoke.settings.prod uv run python manage.py collectstatic --noinput
 
 test: ## Run the test suite
 	uv run pytest
@@ -39,7 +44,7 @@ audit: ## Security checks: bandit, pip-audit, Django's own deploy check
 	uv run pip-audit
 	uv run python manage.py check --deploy --tag security
 
-check: lint test audit ## The full local gate, run before every PR
+check: lint test audit collectstatic ## The full local gate, run before every PR
 
 db-up: ## Start local Postgres + mailpit (docker-compose.yml, chunk 5)
 	docker compose up -d

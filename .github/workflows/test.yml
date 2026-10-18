@@ -33,6 +33,16 @@ jobs:
       - name: Install dependencies
         run: uv sync --locked --all-groups
 
+      # Prod settings, same as `make collectstatic`. The key is the throwaway one
+      # tests/ uses, never a real secret. Catches a broken static pipeline before
+      # deploy; it does not check templates for missing {% static %} references.
+      - name: Collect static files
+        env:
+          DJANGO_SETTINGS_MODULE: pykaraoke.settings.prod
+          DJANGO_SECRET_KEY: "LoGfWyqNt1XvFHL13638FhEjHLTKcrUwIyqqAaT-lrp97qUsC_S7Un3QyQVVHJr9fOc"
+          DJANGO_ALLOWED_HOSTS: "example.com"
+        run: uv run python manage.py collectstatic --noinput
+
       # No Postgres service container yet: DATABASE_URL is blank and there
       # are zero models until Milestone 2. It gets added here alongside the
       # first real migration, not speculatively ahead of it.
