@@ -147,6 +147,38 @@ formatting never reaches review. It no-ops silently until `uv` and `pyproject.to
 
 Verify with `claude doctor`, then `/skills` and `/agents`.
 
+## Issues, labels and draft PRs
+
+The issue is the spec, the draft PR is the plan, and the code comes last. The templates in
+`.github/ISSUE_TEMPLATE/` and `.github/pull_request_template.md` hold the shape of each.
+
+**Type** (one per issue): `task`, `enhancement`, `bug`.
+
+**Status** (one at a time, replaces status words in titles and bodies): `status:ready`,
+`status:in-progress`, `status:cancelled`.
+
+**Area** (any number, by design-system concern): `ci-cd`, `security`, `authentication`,
+`database`, `architecture`, `testing`, `i18n`, `ui-ux`, `devops`, `performance`. Plus the existing
+`accessibility` and `documentation`. `gh issue list --label security` answers "what is open about
+security".
+
+**Milestone**: the native GitHub milestone. The current one has `current` in its title, moved by
+hand.
+
+Rule, in order:
+
+1. Write the issue from the template. Requirements, design and open questions go in it.
+2. Set `status:ready` when the spec is agreed.
+3. Branch from the issue, set `status:in-progress`, and open a **draft PR**. Fill the template
+   with the Goal, Accept criteria and Tests before writing code. The Tests checklist is the
+   plan review.
+4. GitHub rejects a PR with no diff, so the draft needs one commit. Use an empty commit
+   (`git commit --allow-empty`) and push. This is a human step, since Claude is denied commit
+   and push.
+5. Write the code, tick the Tests items as they pass, and mark the PR ready for review.
+
+Old issues (#1 to #11) keep their original format. They are not relabelled.
+
 ## Anti-patterns
 
 - **Skipping plan mode on anything non-trivial.** Agreeing on the approach costs one message;

@@ -100,3 +100,6 @@ in place.
 
 Use the templates: bug, feature, or task. Keep them short. This is a five-person project, not a
 change-control board.
+
+Each issue gets one type label and one status label, plus area labels where they apply. The
+scheme and the issue-to-draft-PR rule are in [docs/AI-WORKFLOW.md](docs/AI-WORKFLOW.md#issues-labels-and-draft-prs).

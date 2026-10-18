@@ -27,6 +27,7 @@ feature. Every feature gets one file here.
 | 06 | [Static files pipeline via WhiteNoise](06-static-files-whitenoise.md) | 1 | in progress |
 | 07 | [Test tooling: factories, shared fixtures, db access](07-test-tooling.md) | 1 | in progress |
 | 08 | [The service layer files: services, exceptions, managers](08-service-layer-files.md) | 1 | in progress |
+| 09 | [Spec-driven GitHub setup: templates, labels, draft PRs](09-spec-driven-github-setup.md) | 1 | in progress |
 
 New entries are appended here by `/learning-checklist`.
 
