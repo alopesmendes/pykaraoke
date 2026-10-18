@@ -113,6 +113,25 @@ make check
 Runs lint, tests, and the security audit. The same gates CI runs in `lint.yml`, `test.yml`, and
 `security.yml`. See [CI-CD.md](CI-CD.md) for what each one actually checks.
 
+## Static files
+
+| Setting | Value | Meaning |
+|---|---|---|
+| `STATIC_URL` | `static/` | URL prefix the browser requests CSS, JS and images from |
+| `STATIC_ROOT` | `staticfiles/` (under the repo) | where `collectstatic` copies every app's static files |
+| `STORAGES["staticfiles"]` | WhiteNoise compressed manifest | adds a content hash to each filename and gzips it |
+
+WhiteNoise serves `STATIC_ROOT` from gunicorn itself, so there is no CDN and no nginx to set up.
+Run the collection step before any production run:
+
+```bash
+make collectstatic
+```
+
+It uses the prod settings on purpose, because the manifest only behaves like production when
+`DEBUG` is off. `staticfiles/` is gitignored. `make check` runs it too, so a broken static
+pipeline fails locally before CI.
+
 ## Troubleshooting
 
 | Error | Cause | Fix |

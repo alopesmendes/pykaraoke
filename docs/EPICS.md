@@ -54,7 +54,7 @@ full gotcha list is in `docs/learning/00-milestone-0-foundation.md`.
 - [ ] Create the layer files: `services.py`, `exceptions.py`, `managers.py`
 - [x] `templates/base.html` with content block, toaster region, modal container
 - [x] i18n setup: `LANGUAGE_CODE = "fr"`, `LANGUAGES = [fr, ja]`, `locale/` directory
-- [ ] Static files pipeline (WhiteNoise)
+- [x] Static files pipeline (WhiteNoise)
 - [ ] `tests/factories.py` scaffold + `conftest.py` fixtures
 - [ ] Learning checklist for the milestone
 

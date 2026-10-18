@@ -18,6 +18,8 @@ Entries are written for someone **using** the site, not for someone reading the 
 - `karaoke` app scaffolded and registered (empty, no behaviour yet).
 - Site languages: French by default, Japanese available. The browser's language picks which one
   is shown. No page is translated yet.
+- Static files (CSS, JavaScript, images) are served by WhiteNoise from the app server, with no CDN
+  or separate web server needed. Files are compressed and fingerprinted for caching.
 
 ### Changed
 - Settings split into `pykaraoke/settings/{base,dev,prod}.py`; `DEBUG` and the security

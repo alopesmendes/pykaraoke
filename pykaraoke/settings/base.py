@@ -50,6 +50,9 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    # Serves collected static files straight from gunicorn: no CDN, no nginx.
+    # Must sit right after SecurityMiddleware so it runs before anything else.
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -139,6 +142,23 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
 STATIC_URL = "static/"
+
+# `collectstatic` copies every app's static files here. WhiteNoise serves this
+# directory, so it must exist before a production run (see docs/SETUP.md).
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# Django 5.1+ reads storage backends from STORAGES. The old STATICFILES_STORAGE
+# setting is ignored by Django 6.1, so setting it would silently do nothing.
+# The manifest adds a content hash to each filename, so browsers can cache
+# forever and a changed file gets a new URL.
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 
 # Email
