@@ -22,6 +22,7 @@ feature. Every feature gets one file here.
 | 01 | [Settings split by environment](01-settings-split.md)       | 1         | in progress |
 | 02 | [Base template and template directory](02-base-template.md) | 1         | in progress |
 | 03 | [i18n setup: fr default, ja secondary](03-i18n-setup.md)    | 1         | in progress |
+| 04 | [Wire PostgreSQL via DATABASE_URL](04-postgres-database-url.md) | 0     | in progress |
 
 New entries are appended here by `/learning-checklist`.
 
