@@ -9,7 +9,8 @@
       "Read(./.env.*)"
     ],
     "ask": [
-      "Bash(gh release *)"
+      "Bash(gh release *)",
+      "Bash(gh pr merge *)"
     ],
     "allow": [
       "Read",

@@ -20,22 +20,21 @@ A **rule** is the only one the model cannot talk its way past.
 
 ```mermaid
 flowchart TD
-  A[Spec or issue] --> B[Plan mode<br/>read code, agree approach]
-  B --> C[Skill loads<br/>project conventions]
-  C --> D[Implement]
-  D --> E[agent verifier<br/>lint + tests + checks]
-  E --> F{Green?}
-  F -->|no| D
-  F -->|yes| G[agent coding-standards]
-  G --> H{Touches auth<br/>or personal data?}
-  H -->|yes| I[agent security-reviewer]
-  H -->|no| J
-  I --> J[/learning-checklist/]
-  J --> K[Update owning doc<br/>+ CHANGELOG]
-  K --> L[Human commits,<br/>pushes, opens PR]
+  A[Issue: status:ready,<br/>current milestone] --> B[/karaoke-issue-launch/]
+  B --> C[agent issue-orchestrator<br/>gate, branch, draft PR]
+  C --> D[You validate the<br/>Tests checklist]
+  D --> E[Implement, tests first<br/>tick Requirements as they land]
+  E --> F[agent verifier + coding-standards<br/>lint, tests, conventions]
+  F -->|red| E
+  F -->|green| G{Touches auth<br/>or personal data?}
+  G -->|yes| H[agent security-reviewer]
+  G -->|no| I
+  H --> I[/learning-checklist/<br/>+ owning doc + CHANGELOG]
+  I --> J[/commit-push-pr/<br/>orchestrator marks PR ready]
 ```
 
-Step `L` is not a formality: Claude is **denied** commit and push. The last move is always yours.
+Step `D` is the plan review: no code exists until you have read the Tests checklist in the draft
+PR. Commit, push and `gh pr ready` are allowed; merging asks first. The merge is always yours.
 
 ## Which surface do I reach for?
 
@@ -92,9 +91,11 @@ version-pinned page instead of guessing.
 | `backend-patterns`  | Models, queries, migrations, services review          | sonnet |
 | `frontend-patterns` | Templates, forms, toaster, modal, i18n, a11y          | sonnet |
 | `security-reviewer` | Django security, OWASP basics, PII policy             | opus   |
+| `issue-orchestrator`| Gates readiness, opens the draft PR, owns issue and PR state | sonnet |
 
 Read-only reviewers run in plan mode. They cannot edit. `doc-writer`, `api-designer` and
 `eval-harness` keep project memory, so conventions accumulate across sessions.
+`issue-orchestrator` has `Bash` and `Read` only: it changes issue and PR state, never code.
 
 ## Rules
 
@@ -125,7 +126,8 @@ sequenceDiagram
 | **deny** `rm -rf`                                                      | Same.                                                |
 | **deny** `Read(./.env*)`                                               | Claude never sees real secrets.                      |
 | **ask** `gh release`                                                   | Outward-facing. You confirm each one.                |
-| **allow** `git commit`, `git push`, `gh pr create`                     | Lets Claude finish a feature and open its PR.        |
+| **ask** `gh pr merge`                                                  | Outward-facing and irreversible in practice.         |
+| **allow** `git commit`, `git push`, `gh pr`, `gh label`                | Lets Claude open the draft PR and mark it ready.     |
 | **allow** `uv`, `make`, `manage.py`, `ruff`, `pytest`, read-only `git` | Project-scoped, reversible, runs unattended.         |
 
 A `PostToolUse` hook runs `ruff format` + `ruff check --fix` on every Python file Claude edits, so
@@ -168,14 +170,19 @@ hand.
 Rule, in order:
 
 1. Write the issue from the template. Requirements, design and open questions go in it.
-2. Set `status:ready` when the spec is agreed.
-3. Branch from the issue, set `status:in-progress`, and open a **draft PR**. Fill the template
-   with the Goal, Accept criteria and Tests before writing code. The Tests checklist is the
-   plan review.
-4. GitHub rejects a PR with no diff, so the draft needs one commit. Use an empty commit
-   (`git commit --allow-empty`) and push. This is a human step, since Claude is denied commit
-   and push.
-5. Write the code, tick the Tests items as they pass, and mark the PR ready for review.
+2. Set `status:ready` when the spec is agreed. Only you set it.
+3. `/karaoke-issue-launch` hands the issue to `issue-orchestrator`. It refuses unless the issue
+   is open, `status:ready` and in the milestone titled `current`. Then it branches
+   (`type/N-slug`), makes an empty commit, pushes, opens a **draft PR** filled from the issue,
+   and sets `status:in-progress`.
+4. Read the Tests checklist in the draft PR and validate it. No code before that.
+5. Write the tests first, then the code. The orchestrator ticks Requirements and Tests as they
+   land.
+6. `/commit-push-pr` commits, pushes, and the orchestrator marks the draft ready once every box
+   is ticked and `make check` is green.
+
+The orchestrator is the only thing that changes labels, draft state or checkboxes. Commands and
+other agents read them.
 
 Old issues (#1 to #11) keep their original format. They are not relabelled.
 

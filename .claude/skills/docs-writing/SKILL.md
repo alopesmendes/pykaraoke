@@ -65,6 +65,7 @@ Diagram rules:
 | New env var, service, or setup step              | `docs/SETUP.md` + `.env.example`       |
 | New or changed workflow                          | `docs/CI-CD.md`                        |
 | New skill, agent, or rule                        | `docs/AI-WORKFLOW.md` + `CLAUDE.md`    |
+| Issue or PR template, label scheme               | `docs/AI-WORKFLOW.md`                  |
 | Anything user-visible                            | `CHANGELOG.md` under `## [Unreleased]` |
 
 A PR that changes behaviour without touching a doc gets one question in review: *which of these

@@ -1,9 +1,13 @@
 ---
-description: Commit the current work, push the branch and open a PR against master
+description: Commit the current work, push the branch and mark its draft PR ready for review
 argument-hint: "[commit subject, optional]"
+model: claude-haiku-5-5
+effort: low
 ---
 
-Ship the current branch: check, commit, push, open a PR. Stop at the first failing step and report it.
+Ship the current branch: check, commit, push, mark the draft PR ready. The draft PR was opened
+by `/karaoke-issue-launch` before any code, so this command never opens a new PR. Stop at the
+first failing step and report it.
 
 ## 1. Check the branch
 
@@ -11,7 +15,9 @@ Ship the current branch: check, commit, push, open a PR. Stop at the first faili
 - If the branch is `master`, stop and ask for a branch name. Do not commit on `master`.
 - If there are no changes and no commits ahead of `master`, stop: nothing to ship.
 - The issue number is the digits after the type prefix, e.g. `chore/11-learning-checklist-...` → `11`.
-  If there is none, ask for it, or use `#` unnumbered.
+  If there is none, ask for it.
+- Find the draft PR: `gh pr view --json number,url,isDraft`. If there is none, stop and say to run
+  `/karaoke-issue-launch` first. The draft is the plan; do not make a PR without it.
 
 ## 2. Run the gate
 
@@ -45,41 +51,16 @@ EOF
 
 - `git push -u origin HEAD`. Never `--force`. If the push is refused, stop and report; do not rebase.
 
-## 5. Open the PR
+## 5. Mark the PR ready
 
-- Skip if a PR for this branch already exists: `gh pr view --json url`. Print its URL instead.
-- Title: the commit subject, e.g. `chore(#11): add learning checklist for milestone 1`.
-- Body follows `.github/pull_request_template.md`: `## What`, `## Why`, `## Checklist`.
-  Fill the checklist from what is true; leave an unticked box unticked and say why in the body.
-- Close with the attribution line:
-
-```
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
-```
-
-Create it against `master`:
-
-```bash
-gh pr create --base master --title "<title>" --body "$(cat <<'EOF'
-## What
-
-...
-
-## Why
-
-...
-
-## Checklist
-- [x] `make check` passes
-- [ ] Docs updated (if behaviour changed)
-- [ ] Learning checklist updated (`docs/learning/`)
-
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
-EOF
-)"
-```
+- Delegate to agent `issue-orchestrator`, mode **ready**, with the PR number and the report that
+  `make check` is green.
+- The orchestrator checks that every Requirement, Accept criterion and Tests item is ticked. If one
+  is not, it refuses and names it. Report that and stop; do not tick boxes here.
+- If the PR is already ready, the orchestrator reports it and changes nothing.
+- The PR body is not rewritten here. It was generated from the issue when the draft was opened.
 
 ## 6. Report
 
-- Print the PR URL, the commit SHA, and the `make check` result line.
-- Note anything left open: unticked checklist items, a missing learning checklist, a skipped step.
+- Print the PR URL, the commit SHA, the `make check` result line, and whether the PR is now ready.
+- Note anything left open: unticked Requirements or Tests, a missing learning checklist, a skipped step.
