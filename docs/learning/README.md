@@ -25,6 +25,7 @@ feature. Every feature gets one file here.
 | 04 | [Wire PostgreSQL via DATABASE_URL](04-postgres-database-url.md) | 0     | in progress |
 | 05 | [Milestone 1 close-out: an empty app that boots](05-milestone-1-architecture.md) | 1 | in progress |
 | 06 | [Static files pipeline via WhiteNoise](06-static-files-whitenoise.md) | 1 | in progress |
+| 07 | [Test tooling: factories, shared fixtures, db access](07-test-tooling.md) | 1 | in progress |
 
 New entries are appended here by `/learning-checklist`.
 
