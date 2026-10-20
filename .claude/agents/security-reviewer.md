@@ -41,8 +41,8 @@ Check:
 
 **Secrets and dependencies**
 - Nothing secret in the repo, in CI logs, or in a workflow's job name. `.env` is gitignored.
-- Run `uv run bandit -r pykaraoke/ karaoke/ -q` and `uv run pip-audit`; report real findings and
-  dismiss false positives explicitly, with the reason.
+- Run `uv run bandit -qr . -c pyproject.toml` and `uv run pip-audit`, the same commands as
+  `make audit`; report real findings and dismiss false positives explicitly, with the reason.
 
 **Abuse**
 - Sign-up and cancel routes are rate-limited. Without it one link in a group chat is an open

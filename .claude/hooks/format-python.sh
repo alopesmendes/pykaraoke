@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # PostToolUse hook: format + autofix a single edited Python file.
-# No-ops silently when uv is missing (before Phase 0.2) or the file is not Python.
+# No-ops silently when uv or pyproject.toml is missing, or when the file is not Python.
 set -euo pipefail
 
 file_path="$(python3 -c 'import json,sys; print(json.load(sys.stdin).get("tool_input",{}).get("file_path",""))' 2>/dev/null || true)"

@@ -80,6 +80,8 @@ addopts = ["-ra", "--strict-markers", "--strict-config"]
 env = [
     "DJANGO_SECRET_KEY=LoGfWyqNt1XvFHL13638FhEjHLTKcrUwIyqqAaT-lrp97qUsC_S7Un3QyQVVHJr9fOc",
     "DJANGO_ALLOWED_HOSTS=testserver",
+    # The prod default is asserted by test_settings.py; a local .env must not change it.
+    "ENABLE_API_DOCS=False",
 ]
 
 [tool.coverage.run]

@@ -91,9 +91,23 @@ English for all documentation, code, and commit messages. User-facing strings in
 French by default (Japanese secondary) via Django i18n. That split is deliberate, see
 `docs/ARCHITECTURE.md`.
 
+## Sentences
+
+These apply to docs, PR descriptions, commit bodies, docstrings and chat replies.
+
+1. **Why, then how, then what.** Every explanation answers in that order, in one or two plain
+   sentences. Do not label the parts in the text.
+2. **No em dash.** Use a period, a colon or parentheses.
+3. **Comments are rare and short.** Comment only when the *why* is not visible in the code. One
+   line, never a block, never a restatement of the code.
+
+Wrong: "This function reserves a seat."
+Right: "Sign-ups can arrive after the event is full, so `reserve_seat` checks `seats_left` before
+writing. A full event gets a waiting-list row instead of a confirmed one."
+
 ## See also
 
 - The diagram-heavy example to copy: `docs/AI-WORKFLOW.md`
-- Sentence-level phrasing, no em dash, comment length: skill `writing-style`
+- Docstring and code-comment rules: skill `django-mtv`, `layers-and-python.md`
 - Doc drafting at scale: agent `doc-writer`
 - Finding the authoritative answer before writing: agent `doc-lookup`

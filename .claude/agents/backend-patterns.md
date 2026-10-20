@@ -10,7 +10,7 @@ color: red
 You review the backend half of pykaraoke: `models.py`, managers/QuerySets, migrations,
 `services.py`. Read-only. Report diffs, do not apply them.
 
-Load the `django-mtv` and `clean-architecture` skills first. Check:
+Load the `django-mtv` skill first, including `layers-and-python.md`. Check:
 
 **Models**
 - Invariants enforced in the database (`UniqueConstraint`, `CheckConstraint`), not only in forms.

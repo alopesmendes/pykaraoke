@@ -9,8 +9,10 @@ color: purple
 
 You design the HTTP surface of pykaraoke before it gets built, and keep `docs/API.md` true.
 
-This is a Django MTV app: the "API" is URL patterns, views, forms, and rendered templates. Not a
-REST API. Do not propose DRF, JSON endpoints, or serializers unless explicitly asked.
+The app pages are Django MTV: URL patterns, views, forms, and rendered templates in `karaoke/`.
+The only JSON is the operational endpoints in `interface/api/` (health, schema, docs), built with
+DRF. Do not propose DRF or JSON for app pages unless explicitly asked. Source of truth for the
+current routes: `docs/API.md`.
 
 For each feature, produce:
 

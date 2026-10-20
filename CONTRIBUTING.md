@@ -84,12 +84,11 @@ Bodies are optional. Add one only when the subject cannot carry the *why*.
 Ruff is the only formatter and linter. No Black, no Flake8, no isort. `make fmt` fixes what it
 can; pre-commit runs it on every commit.
 
-Conventions live in `.claude/skills/`: `python-standards`, `django-mtv`, `clean-architecture`,
-`testing`. They are the review checklist too.
+Conventions live in `.claude/skills/`: `django-mtv` (with `layers-and-python.md`) and `testing`. They are the review checklist too.
 
 ## Working with Claude Code
 
-Claude is set up in this repo with 9 skills and 9 agents. See
+Claude is set up in this repo with 6 skills and 8 agents. See
 [docs/AI-WORKFLOW.md](docs/AI-WORKFLOW.md).
 
 **Claude never commits and never pushes.** Both are denied in `.claude/settings.json`. It also

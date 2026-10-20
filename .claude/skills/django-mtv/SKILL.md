@@ -1,12 +1,31 @@
 ---
 name: django-mtv
-description: Django 6.1 MTV patterns for pykaraoke. Models, QuerySets, migrations, forms, views, templates, and URL naming. Use when creating or changing a model, writing a migration, building a form, adding a view or URL, editing a template, or fixing an N+1 query. Also use when choosing between a function-based and a class-based view.
+description: Django 6.1 MTV patterns and Python style for pykaraoke. Models, QuerySets, migrations, forms, views, templates, URL naming, N+1 queries, type hints, naming, exceptions and Ruff. Also decides where logic belongs (model, QuerySet, services.py, form, view) and when not to abstract. Use when creating or changing a model, writing a migration, building a form, adding a view or URL, editing a template, fixing an N+1, writing or reviewing a .py file, adding business logic, or asked "where should this go?".
 ---
 
-# Django MTV (pykaraoke)
+# Django MTV and Python (pykaraoke)
 
 Django 6.1, PostgreSQL 15+. Project package `pykaraoke/` holds settings only; app code lives in
 the `karaoke/` app. See `docs/ARCHITECTURE.md` for the layout, `docs/DATABASE.md` for the models.
+
+Layer decisions, Python style and the Ruff rules are in `layers-and-python.md`, next to this file.
+Read it when deciding where code goes or how to write a function.
+
+## Where logic goes
+
+| The logic is... | It belongs in |
+|---|---|
+| A fact about one object | model method or property |
+| A reusable query | custom QuerySet method |
+| A database invariant | `Meta.constraints` |
+| Shape of user input | form `clean_*` |
+| A rule spanning objects, or a state change with side effects | `services.py` |
+| HTTP: status, redirect, messages, session | view |
+
+Fast test: could this rule be true in a CLI command with no browser? If yes, service or model.
+
+The code below is the pattern to follow. The models are **planned, not written** until Milestone 2:
+check `docs/DATABASE.md` before copying a field.
 
 ## Models
 
@@ -59,7 +78,8 @@ class ParticipantQuerySet(models.QuerySet):
   access load that field for every instance from the same queryset in one query. Good safety net
   for templates, **not** a replacement for `select_related`. Reach for it when a template
   touches a field you did not plan for.
-- Set `DEBUG_TOOLBAR` query count as the check: an overview page must be O(1) queries, not O(n).
+- Lock the query count in a test with `django_assert_num_queries` (see `testing`). An overview
+  page must be O(1) queries, not O(n). There is no debug toolbar in this project.
 
 ## Migrations
 
@@ -110,7 +130,7 @@ def sign_up(request: HttpRequest, token: str) -> HttpResponse:
     return render(request, "karaoke/sign_up.html", {"form": form, "event": event})
 ```
 
-- Views orchestrate; they never contain business rules. See skill `clean-architecture`.
+- Views orchestrate; they never contain business rules. See `layers-and-python.md`.
 - POST that changes state always redirects (POST/Redirect/GET). No re-render on success.
 - `django.contrib.messages` drives the toaster.
 
@@ -136,6 +156,6 @@ Routes are specified in `docs/API.md`. Update it in the same change.
 
 ## See also
 
-- Layer boundaries: skill `clean-architecture`
+- Layer boundaries, Python conventions, Ruff: `layers-and-python.md` (this skill)
 - Testing models, forms, views: skill `testing`
-- Template/HTMX/toaster patterns: agent `frontend-patterns`
+- Docstrings and comments: `docs-writing`, section "Sentences"

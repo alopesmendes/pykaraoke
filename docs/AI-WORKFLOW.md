@@ -24,7 +24,7 @@ flowchart TD
   B --> C[agent issue-orchestrator<br/>gate, branch, draft PR]
   C --> D[You validate the<br/>Tests checklist]
   D --> E[Implement, tests first<br/>tick Requirements as they land]
-  E --> F[agent verifier + coding-standards<br/>lint, tests, conventions]
+  E --> F[agent verifier<br/>lint, tests, conventions]
   F -->|red| E
   F -->|green| G{Touches auth<br/>or personal data?}
   G -->|yes| H[agent security-reviewer]
@@ -52,11 +52,11 @@ flowchart TD
 
   M --> M1["skill django-mtv<br/>→ agent backend-patterns"]
   V --> V1["skill django-mtv<br/>→ agent api-designer"]
-  T --> T1["agent frontend-patterns"]
+  T --> T1["skill django-mtv<br/>(templates section)"]
   TE --> TE1["skill testing<br/>→ agent eval-harness"]
   CI --> CI1["skill github-actions<br/>skill devops"]
   D --> D1["skill docs-writing<br/>→ agent doc-writer"]
-  W --> W1["skill clean-architecture"]
+  W --> W1["skill django-mtv<br/>(layers-and-python.md)"]
   S --> S1["agent security-reviewer<br/>+ docs/SECURITY.md"]
   L --> L1["/learning-checklist<br/>→ agent verifier"]
 ```
@@ -68,14 +68,11 @@ version-pinned page instead of guessing.
 
 | Skill                | Use it for                                                           |
 |----------------------|----------------------------------------------------------------------|
-| `python-standards`   | Type hints, early returns, naming, exceptions, why a Ruff rule is on |
-| `django-mtv`         | Models, QuerySets, migrations, forms, views, URLs, templates, N+1    |
-| `clean-architecture` | Where a piece of logic belongs, when **not** to abstract             |
+| `django-mtv`         | Models, QuerySets, forms, views, URLs, N+1, where logic belongs, Python style, Ruff |
 | `testing`            | pytest-django, factories, what is worth testing, coverage            |
 | `github-actions`     | Workflow anatomy, uv caching, service containers, environments       |
 | `devops`             | uv, Makefile, Docker, env vars, Postgres, deploy skeleton            |
-| `docs-writing`       | Doc structure, mermaid rules, which doc owns which change            |
-| `writing-style`      | Why/how/what phrasing, no em dash, short code comments               |
+| `docs-writing`       | Doc structure, mermaid rules, doc ownership, sentence style          |
 | `learning-checklist` | `/learning-checklist`, the retention step at the end of a feature    |
 
 ## Agents
@@ -84,12 +81,10 @@ version-pinned page instead of guessing.
 |---------------------|-------------------------------------------------------|--------|
 | `doc-writer`        | Writes/updates docs in house style                    | sonnet |
 | `doc-lookup`        | Finds the authoritative answer, cites it              | haiku  |
-| `verifier`          | Runs the checks, reports real output                  | sonnet |
-| `coding-standards`  | Flags convention deviations Ruff cannot see           | sonnet |
+| `verifier`          | Runs the checks, reviews code against conventions, reports real output | sonnet |
 | `api-designer`      | Designs routes and form contracts, updates `API.md`   | sonnet |
 | `eval-harness`      | Designs and runs a feature's test suite, reports gaps | sonnet |
 | `backend-patterns`  | Models, queries, migrations, services review          | sonnet |
-| `frontend-patterns` | Templates, forms, toaster, modal, i18n, a11y          | sonnet |
 | `security-reviewer` | Django security, OWASP basics, PII policy             | opus   |
 | `issue-orchestrator`| Gates readiness, opens the draft PR, owns issue and PR state | sonnet |
 
@@ -131,7 +126,7 @@ sequenceDiagram
 | **allow** `uv`, `make`, `manage.py`, `ruff`, `pytest`, read-only `git` | Project-scoped, reversible, runs unattended.         |
 
 A `PostToolUse` hook runs `ruff format` + `ruff check --fix` on every Python file Claude edits, so
-formatting never reaches review. It no-ops silently until `uv` and `pyproject.toml` exist.
+formatting never reaches review. It no-ops silently when `uv` or `pyproject.toml` is missing.
 
 ## Adding a skill or an agent
 
