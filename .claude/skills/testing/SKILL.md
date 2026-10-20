@@ -82,7 +82,7 @@ Do not test Django. Test **your** rules.
 ## Coverage
 
 The floor is `fail_under = 70` in `[tool.coverage.report]` in `pyproject.toml`. CI runs
-`pytest --cov` in `test.yml`; locally, `make cov`. Coverage is a floor, not a target. A green 70%
+`pytest --cov` in the TEST job of `ci.yml`; locally, `make cov`. Coverage is a floor, not a target. A green 70%
 with the service layer untested is a failing test suite. `htmlcov/` is gitignored; open it when a
 number looks wrong.
 

@@ -1,0 +1,225 @@
+name: CI
+
+# CI only: BUILD, LINT, TEST, ANALYSIS/SECURITY, then the coverage jobs. Deploys are separate
+# workflows (deploy-dev.yml, deploy-prod.yml) that wait for this one to pass.
+# Each stage is a job whose needs: is the stage before it, so a red stage stops the rest.
+# pip-audit runs on its own, so a red stage above it cannot stop the weekly CVE scan.
+on:
+  push:
+    branches: [master]
+  pull_request:
+  schedule:
+    # Monday 06:00 UTC. Dependency vulnerabilities can appear with no code change on
+    # this repo's side, so pip-audit reruns even when nothing was pushed.
+    - cron: "0 6 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  # Pull requests cancel the run they superseded. Pushes to master always finish, since
+  # deploy-dev.yml waits on them.
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v10.1.0
+        with:
+          # Pinned: unpinned, uv picks the newest CPython (3.15 today), which
+          # psycopg-binary has no wheel for. 3.13 matches the Dockerfile.
+          python-version: "3.13"
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Install dependencies
+        run: uv sync --locked
+
+      # Prod settings, same as `make collectstatic`. The key is the throwaway one
+      # tests/ uses, never a real secret.
+      - name: Collect static files
+        env:
+          DJANGO_SETTINGS_MODULE: pykaraoke.settings.prod
+          DJANGO_SECRET_KEY: "LoGfWyqNt1XvFHL13638FhEjHLTKcrUwIyqqAaT-lrp97qUsC_S7Un3QyQVVHJr9fOc"
+          DJANGO_ALLOWED_HOSTS: "example.com"
+        run: uv run python manage.py collectstatic --noinput
+
+  lint:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v10.1.0
+        with:
+          python-version: "3.13"
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Install dependencies
+        run: uv sync --locked --all-groups
+
+      - name: Cache pre-commit hook environments
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
+
+      # Same config the local git hook runs, so CI can never disagree with a
+      # local run. Not pre-commit/action: it installs its own pre-commit via
+      # pip, bypassing the version pinned in uv.lock.
+      - name: Run pre-commit
+        run: uv run pre-commit run --all-files --show-diff-on-failure
+
+  test:
+    needs: lint
+    runs-on: ubuntu-latest
+    # Runs project code and dependencies, so it stays read-only. Coverage is published by
+    # jobs that run no project code.
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v10.1.0
+        with:
+          python-version: "3.13"
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Install dependencies
+        run: uv sync --locked --all-groups
+
+      # The tests run with prod settings, whose static storage needs the manifest that
+      # collectstatic writes. BUILD writes it on its own runner, so TEST builds its own.
+      - name: Collect static files
+        env:
+          DJANGO_SETTINGS_MODULE: pykaraoke.settings.prod
+          DJANGO_SECRET_KEY: "LoGfWyqNt1XvFHL13638FhEjHLTKcrUwIyqqAaT-lrp97qUsC_S7Un3QyQVVHJr9fOc"
+          DJANGO_ALLOWED_HOSTS: "example.com"
+        run: uv run python manage.py collectstatic --noinput
+
+      # No Postgres service container yet: DATABASE_URL is blank and there
+      # are zero models until Milestone 2. It gets added here alongside the
+      # first real migration, not speculatively ahead of it.
+      - name: Run tests
+        run: uv run pytest --cov --cov-report=xml --cov-report=html --cov-report=term
+
+      # Hidden files are skipped by default, and .coverage is the file the comment action reads.
+      - name: Upload coverage data
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage
+          path: |
+            .coverage
+            coverage.xml
+            htmlcov/
+          include-hidden-files: true
+          retention-days: 14
+
+  analysis:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v10.1.0
+        with:
+          python-version: "3.13"
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Install dependencies
+        run: uv sync --locked --all-groups
+
+      # -c is required, or bandit ignores [tool.bandit] and crawls .venv.
+      - name: Bandit
+        run: uv run bandit -qr . -c pyproject.toml
+
+      # Scoped to security, same as `make audit`: no real SMTP configured
+      # yet, so the unscoped check always fails on mail.E001. Secret key
+      # below is the same throwaway value tests/ uses, never a real one.
+      # manage.py defaults to settings.dev, so prod must be named explicitly.
+      - name: Django deploy check
+        env:
+          DJANGO_SETTINGS_MODULE: pykaraoke.settings.prod
+          DJANGO_SECRET_KEY: "LoGfWyqNt1XvFHL13638FhEjHLTKcrUwIyqqAaT-lrp97qUsC_S7Un3QyQVVHJr9fOc"
+          DJANGO_ALLOWED_HOSTS: "example.com"
+        run: uv run python manage.py check --deploy --tag security --fail-level WARNING
+
+  # No needs: runs on every event, including the weekly schedule. Dev deploys need it green;
+  # a manual prod deploy can go ahead without it (see deploy-prod.yml).
+  pip-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v10.1.0
+        with:
+          python-version: "3.13"
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Install dependencies
+        run: uv sync --locked --all-groups
+
+      - name: pip-audit
+        run: uv run pip-audit
+
+  # Pull requests only: posts or updates the coverage comment. Runs no project code, so it
+  # holds no contents write; the comment needs only pull-requests write.
+  coverage-pr:
+    needs: test
+    if: ${{ !cancelled() && github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    permissions:
+      # Forked pull requests are downgraded to read-only by GitHub, so this grants
+      # no write access to untrusted code.
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: coverage
+
+      - name: Coverage comment
+        uses: py-cov-action/python-coverage-comment-action@e5fb2218463c3377f3504b0c5b5646ed53da7a2f # v4.5
+        with:
+          GITHUB_TOKEN: ${{ github.token }}
+
+  # Push to master only: saves the numbers that feed the README badge, on the
+  # python-coverage-comment-action-data branch. This is the only job with contents write, and it
+  # runs no project code, only the coverage action.
+  coverage-badge:
+    needs: test
+    if: ${{ !cancelled() && github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: coverage
+
+      - name: Coverage badge
+        uses: py-cov-action/python-coverage-comment-action@e5fb2218463c3377f3504b0c5b5646ed53da7a2f # v4.5
+        with:
+          GITHUB_TOKEN: ${{ github.token }}

@@ -1,10 +1,12 @@
 name: Deploy dev
 
-# Every merge to master is a dev deploy: tested, tagged, then Render is told to
-# build that commit. Production is a separate, manual workflow.
+# Every merge to master is a dev deploy, but only after CI passed on that commit. It waits
+# for the CI workflow to finish, then deploys only if it succeeded for a push to master.
+# Production is a separate, manual workflow.
 on:
-  push:
-    branches: [master]
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
 
 permissions:
   contents: read
@@ -16,15 +18,12 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # Reusable-workflow calls, so lint.yml and test.yml stay the one definition of "passes".
-  lint:
-    uses: ./.github/workflows/lint.yml
-
-  test:
-    uses: ./.github/workflows/test.yml
-
   deploy:
-    needs: [lint, test]
+    # A schedule run of CI is also on master, so the event check keeps it from deploying.
+    if: >-
+      github.event.workflow_run.conclusion == 'success'
+      && github.event.workflow_run.event == 'push'
+      && github.event.workflow_run.head_branch == 'master'
     runs-on: ubuntu-latest
     environment:
       name: development
@@ -33,6 +32,8 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          # The commit CI tested, not whatever master points at by now.
+          ref: ${{ github.event.workflow_run.head_sha }}
           # The tag script reads every existing tag, so the history must be complete.
           fetch-depth: 0
 
@@ -46,8 +47,9 @@ jobs:
       - name: Tag the commit
         env:
           TAG: ${{ steps.version.outputs.tag }}
+          SHA: ${{ github.event.workflow_run.head_sha }}
         run: |
-          git tag "$TAG" "$GITHUB_SHA"
+          git tag "$TAG" "$SHA"
           git push origin "refs/tags/$TAG"
 
       # Render builds the image from the repo. ref pins the build to this commit,
@@ -55,4 +57,5 @@ jobs:
       - name: Trigger the Render dev deploy
         env:
           DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_DEV }}
-        run: curl -fsS -X POST "${DEPLOY_HOOK}&ref=${GITHUB_SHA}"
+          SHA: ${{ github.event.workflow_run.head_sha }}
+        run: curl -fsS -X POST "${DEPLOY_HOOK}&ref=${SHA}"

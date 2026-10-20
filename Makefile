@@ -38,13 +38,13 @@ fmt: ## Ruff check --fix + format (rewrites files)
 
 # bandit needs -c or it ignores pyproject.toml and crawls .venv.
 # No --fail-level here: DEBUG=True locally is correct and produces expected
-# warnings. The strict check lives in tests/test_smoke.py and security.yml.
+# warnings. The strict check lives in tests/test_smoke.py and ci.yml (ANALYSIS/SECURITY).
 audit: ## Security checks: bandit, pip-audit, Django's own deploy check
 	uv run bandit -qr . -c pyproject.toml
 	uv run pip-audit
 	uv run python manage.py check --deploy --tag security
 
-check: lint test audit collectstatic ## The full local gate, run before every PR
+check: collectstatic lint test audit ## The full local gate, run before every PR
 
 db-up: ## Start local Postgres + mailpit (docker-compose.yml, chunk 5)
 	docker compose up -d

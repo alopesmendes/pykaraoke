@@ -114,16 +114,16 @@ make superuser
 make check
 ```
 
-Runs lint, tests, and the security audit. The same gates CI runs in `lint.yml`, `test.yml`, and
-`security.yml`. See [CI-CD.md](CI-CD.md) for what each one actually checks.
+Runs lint, tests, and the security audit. The same gates CI runs in the LINT, TEST and
+ANALYSIS/SECURITY jobs of `ci.yml`. See [CI-CD.md](CI-CD.md) for what each one actually checks.
 
 ## Static files
 
-| Setting | Value | Meaning |
-|---|---|---|
-| `STATIC_URL` | `static/` | URL prefix the browser requests CSS, JS and images from |
-| `STATIC_ROOT` | `staticfiles/` (under the repo) | where `collectstatic` copies every app's static files |
-| `STORAGES["staticfiles"]` | WhiteNoise compressed manifest | adds a content hash to each filename and gzips it |
+| Setting                   | Value                           | Meaning                                                 |
+|---------------------------|---------------------------------|---------------------------------------------------------|
+| `STATIC_URL`              | `static/`                       | URL prefix the browser requests CSS, JS and images from |
+| `STATIC_ROOT`             | `staticfiles/` (under the repo) | where `collectstatic` copies every app's static files   |
+| `STORAGES["staticfiles"]` | WhiteNoise compressed manifest  | adds a content hash to each filename and gzips it       |
 
 WhiteNoise serves `STATIC_ROOT` from gunicorn itself, so there is no CDN and no nginx to set up.
 Run the collection step before any production run:
@@ -138,12 +138,12 @@ pipeline fails locally before CI.
 
 ## Troubleshooting
 
-| Error | Cause | Fix |
-|---|---|---|
-| `ImproperlyConfigured: Set the DJANGO_SECRET_KEY environment variable` | no `.env`, or it wasn't copied from `.env.example` | step 2 |
-| `OperationalError: connection to server ... refused` on `migrate` | `.env` has a `DATABASE_URL` pointing at Postgres, but `make db-up` was never run | run `make db-up`, or blank `DATABASE_URL` to fall back to SQLite |
-| `ModuleNotFoundError` after pulling new changes | dependencies changed and `.venv` is stale | `make install` again |
-| A commit is rejected or silently rewritten | the local git hooks (`pre-commit`, `prepare-commit-msg`) are doing their job | see [CONTRIBUTING.md](../CONTRIBUTING.md) for the commit format they enforce |
+| Error                                                                  | Cause                                                                            | Fix                                                                          |
+|------------------------------------------------------------------------|----------------------------------------------------------------------------------|------------------------------------------------------------------------------|
+| `ImproperlyConfigured: Set the DJANGO_SECRET_KEY environment variable` | no `.env`, or it wasn't copied from `.env.example`                               | step 2                                                                       |
+| `OperationalError: connection to server ... refused` on `migrate`      | `.env` has a `DATABASE_URL` pointing at Postgres, but `make db-up` was never run | run `make db-up`, or blank `DATABASE_URL` to fall back to SQLite             |
+| `ModuleNotFoundError` after pulling new changes                        | dependencies changed and `.venv` is stale                                        | `make install` again                                                         |
+| A commit is rejected or silently rewritten                             | the local git hooks (`pre-commit`, `prepare-commit-msg`) are doing their job     | see [CONTRIBUTING.md](../CONTRIBUTING.md) for the commit format they enforce |
 
 ## See also
 

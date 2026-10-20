@@ -8,7 +8,9 @@ argument-hint: "[beginner|intermediate|advanced] or ignore or verify"
 
 By default this skill teaches the feature on the current branch while showing the code. **It
 shows code and never edits files**: the user types it themselves, which is the point of a learning
-project. The one exception is `ignore` (section 2), where it edits files and explains nothing.
+project. The one exception is `ignore` (section 2), where it edits files for every Requirement and
+explains nothing. Verify (section 5) is not run in `ignore`: it waits until the user has validated
+the Tests checklist.
 
 ## 1. Find the feature
 
@@ -31,10 +33,12 @@ If a Requirement is unclear, ask. Do not guess.
 
 The level applies to this session. A new `/guide <level>` call changes it.
 
-**Ignore mode** works through the Requirements in the same order as section 4, tests first, and
-edits the files itself. It prints a short line per Requirement (done, or what could not be done
-and why) and no explanations. It never ticks boxes: that is `issue-orchestrator`. It still records
-the header (section 3) and still ends with verify (section 5).
+**Ignore mode** implements **all** Requirements in the same order as section 4, and edits the files
+itself. For each Requirement it writes the tests from the Tests checklist first, then the code, and
+runs those tests. It prints a short line per Requirement (done, or what could not be done and why)
+and no explanations. It never ticks boxes: that is `issue-orchestrator`. It still records the header
+(section 3). It does not run verify (section 5): it stops after the code and says that verify waits
+for the validated Tests checklist. The user then runs `/guide verify`.
 
 | Level | How each step is explained |
 |-------|----------------------------|
@@ -85,9 +89,11 @@ Rules that the code must follow:
 - A layer folder that does not exist yet (`domain/`, `application/`, `infrastructure/`) is created
   as part of the step that first needs it. Say so.
 
-## 5. Verify (ends every session)
+## 5. Verify (ends every walkthrough session)
 
 Run `/guide verify`. Run each check, and print its real output. Do not summarise a failure.
+`/guide ignore` never runs this section; its verify is the separate `/guide verify` call, made
+after the Tests checklist is validated.
 
 | # | Check | Command |
 |---|-------|---------|

@@ -18,6 +18,12 @@ Entries are written for someone **using** the site, not for someone reading the 
 - Learning checklists under `docs/learning/`, one per feature. Milestone 1 checklist added
   (app skeleton, settings split, Postgres, base template, i18n).
 - Claude Code workflow: 6 skills, 8 agents, committed permissions, auto-format hook.
+
+### Changed
+- CI is one pipeline, `ci.yml`: BUILD, LINT, TEST, ANALYSIS/SECURITY. Each stage waits for the one
+  before it. Deploys are separate workflows: dev deploys after a push to master passes CI, and prod
+  is a manual run with the reviewer gate that deploys even if pip-audit failed. Python 3.13 only.
+- Test coverage is reported on each pull request as a comment, and the README shows a coverage badge.
 - GitHub issue and pull request templates.
 - Spec-driven GitHub setup: issue templates hold the spec (goal, requirements, design, open
   questions), the pull request template holds the plan (accept criteria, tests, architecture).
