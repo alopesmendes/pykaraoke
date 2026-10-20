@@ -81,7 +81,7 @@ What goes where:
 | Formatting | template or template tag |
 
 Deliberately **absent**: repository classes, use-case objects, DTOs, single-implementation
-interfaces, a `domain/` package. See the `clean-architecture` skill for why.
+interfaces, a `domain/` package. See `.claude/skills/django-mtv/layers-and-python.md` for why.
 
 ## Access model
 

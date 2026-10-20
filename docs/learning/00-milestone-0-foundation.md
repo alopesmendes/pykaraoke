@@ -51,7 +51,7 @@ Phase 0.2 (coming. These are the ones to actually learn):
 
 - [ ] Open `.claude/settings.json` and predict what happens for `git push origin master`. Then ask
       Claude to run it and confirm.
-- [ ] Read one skill end to end (`clean-architecture` is the shortest) and find one rule you
+- [ ] Read one skill end to end (`django-mtv/layers-and-python.md` is the shortest) and find one rule you
       disagree with. Change it. It is your repo.
 - [ ] After chunk 1: delete `.venv/`, run `uv sync`, time it.
 - [ ] After chunk 1: add a deliberately bad line (`import os` unused, a bare `except:`) and run

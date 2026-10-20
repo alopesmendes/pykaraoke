@@ -28,7 +28,6 @@ Delegate to agent `issue-orchestrator`, mode **open**, with the issue number.
 
 - Read only the `## Requirements` section of the issue body. Each `- [ ]` item in it is a task,
   in order. Items elsewhere in the body are not tasks.
-- Keep the `**Learn**` section for step 7.
 - Print the tasks back as a numbered plan before touching code.
 
 ## 4. Validate the tests (stop here)
@@ -53,8 +52,9 @@ not name.
 
 ## 6. Verify
 
-- Run `make check` (lint + tests + audit). If it fails, fix the cause, then rerun.
-- Run the `verifier` agent on the result when the batch is large.
+- Run `make check` (lint + tests + audit + collectstatic). If it fails, fix the cause, then rerun.
+- Run the `verifier` agent on the result when the batch is large. It also reviews the code
+  against the conventions.
 - Update the owning doc and `CHANGELOG.md` under `## [Unreleased]` for each behaviour change
   (table in skill `docs-writing`).
 

@@ -13,7 +13,7 @@ Entries are written for someone **using** the site, not for someone reading the 
 - Project documentation: architecture, database, API, security, epics.
 - Learning checklists under `docs/learning/`, one per feature. Milestone 1 checklist added
   (app skeleton, settings split, Postgres, base template, i18n).
-- Claude Code workflow: 9 skills, 10 agents, committed permissions, auto-format hook.
+- Claude Code workflow: 6 skills, 8 agents, committed permissions, auto-format hook.
 - GitHub issue and pull request templates.
 - Spec-driven GitHub setup: issue templates hold the spec (goal, requirements, design, open
   questions), the pull request template holds the plan (accept criteria, tests, architecture).

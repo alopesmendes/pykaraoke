@@ -12,14 +12,13 @@ subclassing. Plain functions and fixtures.
 
 ```
 tests/
-  conftest.py              # shared fixtures
+  conftest.py              # shared fixtures, pytest-env throwaway settings
   factories.py             # factory-boy factories, one per model
   test_smoke.py            # settings load, system checks pass
-  karaoke/
-    test_models.py         # constraints, properties, custom QuerySets
-    test_forms.py          # validation rules, error messages
-    test_services.py       # business rules, the densest file
-    test_views.py          # status codes, redirects, template used, auth gating
+  test_factories.py        # factories build valid instances
+  test_base_template.py    # base.html shell: toaster, modal, i18n
+  interface/               # operational endpoints: health, api docs
+  karaoke/                 # planned from Milestone 2: models, forms, services, views
 ```
 
 Mirror the source tree. One test module per source module.
@@ -82,9 +81,10 @@ Do not test Django. Test **your** rules.
 
 ## Coverage
 
-`--cov=. --cov-fail-under=70` in CI. Coverage is a floor, not a target. A green 70% with the
-service layer untested is a failing test suite. `htmlcov/` is gitignored; run `make cov` and open
-it when a number looks wrong.
+The floor is `fail_under = 70` in `[tool.coverage.report]` in `pyproject.toml`. CI runs
+`pytest --cov` in `test.yml`; locally, `make cov`. Coverage is a floor, not a target. A green 70%
+with the service layer untested is a failing test suite. `htmlcov/` is gitignored; open it when a
+number looks wrong.
 
 ## Speed
 
@@ -102,6 +102,6 @@ it when a number looks wrong.
 
 ## See also
 
-- Function shape and error classes: skill `python-standards`
-- Where the rule under test should live: skill `clean-architecture`
+- Function shape and error classes: skill `django-mtv`, `layers-and-python.md`
+- Where the rule under test should live: skill `django-mtv`, `layers-and-python.md`
 - Deeper coverage audits: agent `eval-harness`

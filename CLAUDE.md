@@ -77,17 +77,16 @@ make db-up       # docker compose: postgres + mailpit
 |-------------------------------------------|------------------------------------------------------|
 | Models, ORM, migrations, N+1              | skill `django-mtv` → agent `backend-patterns`        |
 | Views, forms, URL design                  | skill `django-mtv` → agent `api-designer`            |
-| Templates, toaster, modal, i18n, a11y     | agent `frontend-patterns`                            |
-| Where should this code live?              | skill `clean-architecture`                           |
-| Python style, type hints, exceptions      | skill `python-standards`                             |
+| Where should this code live?              | skill `django-mtv` (`layers-and-python.md`)          |
+| Python style, type hints, exceptions      | skill `django-mtv` (`layers-and-python.md`)          |
 | Writing tests                             | skill `testing` → agent `eval-harness`               |
 | Did it actually pass?                     | agent `verifier`                                     |
-| Convention review before a PR             | agent `coding-standards`                             |
+| Convention review before a PR             | agent `verifier`                                     |
 | Auth, tokens, personal data               | agent `security-reviewer` + `docs/SECURITY.md`       |
 | CI, workflows, secrets                    | skill `github-actions`                               |
 | Docker, env vars, deploy                  | skill `devops`                                       |
 | Writing or updating docs                  | skill `docs-writing` → agent `doc-writer`            |
-| Phrasing an explanation, PR text, comment | skill `writing-style`                                |
+| Phrasing an explanation, PR text, comment | skill `docs-writing`                                 |
 | "Does this API really work that way?"     | agent `doc-lookup`                                   |
 | Launch an issue's Requirements            | `/karaoke-issue-launch` → agent `issue-orchestrator` |
 | Issue state, draft PR, labels, ready      | agent `issue-orchestrator`                           |
@@ -137,5 +136,5 @@ pykaraoke/
     tests/                   # mirrors the layers above
     docs/                    # the files in Docs
     manage.py
-.claude/     9 skills, 10 agents, permissions, format hook
+.claude/     6 skills, 8 agents, permissions, format hook
 ```

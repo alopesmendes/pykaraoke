@@ -19,7 +19,8 @@ Process:
    every access rule, every empty/boundary state (no participants, event full, already cancelled).
 2. **Write the scenarios** as a table first. Layer | scenario | expected. And show it.
 3. **Implement** the tests, one module per source module, factories in `tests/factories.py`.
-4. **Run** `uv run pytest -q --cov` and read the report.
+   Mirror the source tree: `tests/karaoke/` for the `karaoke/` app, `tests/interface/` for `interface/`.
+4. **Run** `make cov` and read the report. The floor is 70%, set in `pyproject.toml`.
 5. **Report the gaps**: which branches are uncovered and whether each one matters. Coverage
    percentage alone is not a report.
 
