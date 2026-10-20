@@ -3,7 +3,19 @@
 *Every URL, what it accepts, what it returns, and who is allowed to reach it.*
 
 This is a server-rendered Django MTV app. "API" here means URL patterns, forms and templates.
-There are no JSON endpoints. Status: **designed, not implemented** (Milestones 2-3).
+The only JSON endpoint is the health probe below. Status of the app routes: **designed, not
+implemented** (Milestones 2-3).
+
+## Operational endpoints
+
+| Name     | Pattern   | Methods | View     | Response                 | Access |
+|----------|-----------|---------|----------|--------------------------|--------|
+| `health` | `/health/` | GET     | `health` | 200 `{"status": "ok"}`   | public |
+
+- Touches no database and no session, so it answers even when the DB is down.
+- Plain HTTP is allowed (`SECURE_REDIRECT_EXEMPT` in `prod.py`), because Render's probe does not
+  send HTTPS.
+- Any other method returns 405.
 
 ## Routes
 

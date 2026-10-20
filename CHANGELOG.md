@@ -24,6 +24,8 @@ Entries are written for someone **using** the site, not for someone reading the 
   is shown. No page is translated yet.
 - Static files (CSS, JavaScript, images) are served by WhiteNoise from the app server, with no CDN
   or separate web server needed. Files are compressed and fingerprinted for caching.
+- Health check at `/health/`: answers `{"status": "ok"}` without touching the database, so the
+  hosting platform can tell when the site is up.
 
 ### Changed
 - Claude Code issue flow: `/karaoke-issue-launch` reads the issue's Requirements, opens a draft PR
