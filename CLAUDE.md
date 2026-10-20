@@ -89,6 +89,8 @@ make db-up       # docker compose: postgres + mailpit
 | Phrasing an explanation, PR text, comment | skill `docs-writing`                                 |
 | "Does this API really work that way?"     | agent `doc-lookup`                                   |
 | Launch an issue's Requirements            | `/karaoke-issue-launch` → agent `issue-orchestrator` |
+| Guided walkthrough of a feature, by level | `/guide [level]` → skill `guide`                     |
+| Verify a guided session                   | `/guide verify` → skill `guide`                      |
 | Issue state, draft PR, labels, ready      | agent `issue-orchestrator`                           |
 | Finished a feature                        | `/learning-checklist`                                |
 
@@ -136,5 +138,5 @@ pykaraoke/
     tests/                   # mirrors the layers above
     docs/                    # the files in Docs
     manage.py
-.claude/     6 skills, 8 agents, permissions, format hook
+.claude/     7 skills, 8 agents, 3 commands, permissions, format hook
 ```
