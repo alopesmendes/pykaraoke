@@ -81,6 +81,18 @@ def test_test_job_uploads_the_coverage_data_the_comment_jobs_read() -> None:
     assert ".coverage" in upload[0]["with"]["path"]
 
 
+def test_test_job_collects_static_files_before_pytest() -> None:
+    # Prod settings use a manifest storage. pytest fails without the manifest, and BUILD's
+    # collectstatic output is on a different runner, so TEST has to build its own.
+    steps = ci()["jobs"]["test"]["steps"]
+    names = [s.get("name", "") for s in steps]
+
+    collect = names.index("Collect static files")
+    run_tests = names.index("Run tests")
+    assert collect < run_tests
+    assert steps[collect]["env"]["DJANGO_SETTINGS_MODULE"] == "pykaraoke.settings.prod"
+
+
 def test_only_the_badge_job_can_write_contents() -> None:
     jobs = ci()["jobs"]
 

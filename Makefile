@@ -44,7 +44,7 @@ audit: ## Security checks: bandit, pip-audit, Django's own deploy check
 	uv run pip-audit
 	uv run python manage.py check --deploy --tag security
 
-check: lint test audit collectstatic ## The full local gate, run before every PR
+check: collectstatic lint test audit ## The full local gate, run before every PR
 
 db-up: ## Start local Postgres + mailpit (docker-compose.yml, chunk 5)
 	docker compose up -d
