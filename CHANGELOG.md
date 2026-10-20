@@ -26,6 +26,8 @@ Entries are written for someone **using** the site, not for someone reading the 
   or separate web server needed. Files are compressed and fingerprinted for caching.
 - Health check at `/health/`: answers `{"status": "ok"}` without touching the database, so the
   hosting platform can tell when the site is up.
+- Docker image serves on the port the host sets (`PORT`), applies migrations when it starts, and
+  reports healthy once `/health/` answers.
 
 ### Changed
 - Claude Code issue flow: `/karaoke-issue-launch` reads the issue's Requirements, opens a draft PR
