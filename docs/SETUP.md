@@ -50,6 +50,10 @@ secrets never need to pass through an AI session.
 DEBUG is hardcoded in whichever one loads. Override `DJANGO_SETTINGS_MODULE` yourself only to
 run one against the other's settings on purpose.
 
+Two optional keys exist beyond the table: `CSRF_TRUSTED_ORIGINS` (comma-separated, scheme
+included, e.g. `https://example.onrender.com`; needed behind a proxy) and `ENABLE_API_DOCS`
+(serves `/api/schema/` and `/api/docs/`; on by default in dev, off elsewhere unless set).
+
 ## 3. Install
 
 ```bash
@@ -87,9 +91,9 @@ Re-run `make migrate` after switching. SQLite and Postgres are separate database
 UI is at <http://localhost:8025>; `make db-down` stops both containers (data survives; `docker
 compose down -v` wipes it).
 
-> **Not verified on this project's own dev machine**. Docker isn't installed there. If
-> `make db-up` behaves unexpectedly, that's the untested path; the SQLite default is the one
-> that's actually been run.
+> **Verified paths**: the SQLite default is the everyday path. The production `Dockerfile` was
+> built and its container health check passed locally. TODO(verify): `make db-up` (Postgres +
+> mailpit) was not re-run for this change.
 
 ## 6. Run the dev server
 
@@ -144,5 +148,5 @@ pipeline fails locally before CI.
 ## See also
 
 - What each `make` target actually runs: the `Makefile`, or `make help`
-- Env vars, Docker, and the deploy skeleton in depth: skill `devops`
+- Env vars, Docker, and the Render deploy flow in depth: skill `devops`
 - The CI pipeline these same checks run in: [CI-CD.md](CI-CD.md)

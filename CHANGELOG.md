@@ -37,6 +37,12 @@ Entries are written for someone **using** the site, not for someone reading the 
   `/commit-push-pr` marks that draft ready instead of opening a new PR.
 - Settings split into `pykaraoke/settings/{base,dev,prod}.py`; `DEBUG` and the security
   block are hardcoded per environment instead of read from `DJANGO_DEBUG`.
+- Every merge to `master` deploys to the development site and is tagged `vX.Y.Z-dev.N`.
+  Production is deployed by hand, after a reviewer approves, and tagged `vX.Y.Z`.
+
+### Removed
+- The workflow that built a container image and pushed it to GitHub's registry. The hosting
+  platform builds the image from the repository on each deploy.
 
 ### Security
 - Dependencies `urllib3` (2.8.0) and `virtualenv` (21.14.10) upgraded to clear 11 known

@@ -5,8 +5,9 @@ description: GitHub Actions conventions for pykaraoke. Workflow anatomy, uv cach
 
 # GitHub Actions (pykaraoke)
 
-Four workflows, one job each unless stated: `lint.yml`, `test.yml`, `security.yml`, `deploy.yml`.
-The pipeline as a whole is documented in `docs/CI-CD.md`.
+Five workflows: `lint.yml`, `test.yml`, `security.yml`, `deploy-dev.yml`, `deploy-prod.yml`.
+The deploy ones call lint and test as reusable workflows (`workflow_call`), then tag and trigger
+Render. The pipeline as a whole is documented in `docs/CI-CD.md`.
 
 ## Every workflow starts the same way
 
@@ -29,11 +30,11 @@ concurrency:
 Three rules behind that block:
 
 1. **`permissions` is always explicit and always minimal.** Default `contents: read`. Add
-   `packages: write` only in the job that pushes to GHCR, `id-token: write` only for OIDC.
+   `contents: write` only in the deploy job that pushes the tag, `id-token: write` only for OIDC.
    Never leave the repository default in place.
 2. **`concurrency` with `cancel-in-progress`** so a force-push does not burn minutes on a stale
-   commit. Never cancel in progress on `deploy.yml`. A half-cancelled deploy is worse than a
-   wasted minute.
+   commit. Never cancel in progress on `deploy-dev.yml` or `deploy-prod.yml`. A half-cancelled
+   deploy is worse than a wasted minute.
 3. **`on.pull_request` without a branch filter**, `on.push` limited to `master`. Otherwise every
    PR runs twice.
 
@@ -105,28 +106,28 @@ connections and fails intermittently. The job then reaches it at
 | Kind | Where | Example |
 |---|---|---|
 | Non-secret config | `env:` in the workflow | `DJANGO_SETTINGS_MODULE` |
-| Repository secret | `${{ secrets.X }}` | `DJANGO_SECRET_KEY` for the deploy job |
-| Environment secret | `environment: production` + `${{ secrets.X }}` | provider token |
-| Built-in | `${{ secrets.GITHUB_TOKEN }}` | pushing to GHCR, no PAT needed |
+| Repository secret | `${{ secrets.X }}` | `RENDER_DEPLOY_HOOK_DEV`, `RENDER_DEPLOY_HOOK_PROD` |
+| Environment secret | `environment: production` + `${{ secrets.X }}` | a token only prod may read |
+| Built-in | `${{ secrets.GITHUB_TOKEN }}` | `gh` calls in a workflow, no PAT needed |
 
 **Never `echo` a secret**, never put one in a job name or an artifact. GitHub masks known secrets
 in logs, but not values you derive from them.
 
 `environment:` gives two things worth having: scoped secrets, and **required reviewers**.
-That is how `deploy-production` waits for a human click instead of a branch rule.
+That is how `deploy-prod.yml` waits for a human click instead of a branch rule.
 
 ## Deploy gating
 
 ```yaml
-  deploy-production:
-    needs: deploy-staging
+  deploy:
+    needs: [lint, test]
     environment:
       name: production
-      url: ${{ steps.deploy.outputs.url }}
 ```
 
 `needs:` chains the jobs; the `production` environment's protection rules hold the run until
-approved. Configure the reviewers in **Settings → Environments**, not in YAML.
+approved. Configure the reviewers in **Settings → Environments**, not in YAML. Deploy jobs
+check out with `fetch-depth: 0` because `next-version.sh` reads every tag.
 
 ## Verify a workflow before pushing it
 
@@ -144,5 +145,5 @@ GitHub Actions minutes spent finding out the hard way.
 ## See also
 
 - What each workflow gates: `docs/CI-CD.md`
-- Docker image built by `deploy.yml`: skill `devops`
+- Dockerfile and the Render deploy flow (CI builds no image): skill `devops`
 - Local equivalents of every CI gate: the `Makefile`
