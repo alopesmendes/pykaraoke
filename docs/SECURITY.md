@@ -70,6 +70,19 @@ on every push.
 CSRF protection is on for every POST. The confirmation modal submits a real form with
 `{% csrf_token %}`, not a link.
 
+## Deployment
+
+| Control | Why | What breaks if it changes |
+|---|---|---|
+| `ENABLE_API_DOCS` off in prod | `/api/schema/` and `/api/docs/` map every route; they answer 404 unless the flag is on | Setting it in prod publishes the API surface |
+| `SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")` | Render terminates TLS, so Django sees plain HTTP and would redirect forever | Behind anything but Render, a client can forge the header and fake HTTPS |
+| `SECURE_REDIRECT_EXEMPT` for `/health/` | The container health check speaks plain HTTP | Dropping it fails the check with a redirect |
+| Deploy hooks are GitHub secrets (`RENDER_DEPLOY_HOOK_DEV`, `RENDER_DEPLOY_HOOK_PROD`) | A hook URL deploys with no other auth; anyone holding it can trigger a build | Committing one means rotating it in Render first |
+| Reviewer on the `production` environment | `deploy-prod.yml` waits for a human approval before tagging and calling the hook | Without the setting the job runs unattended. TODO(verify): confirm it is set |
+
+The proxy header is trusted only because Render is the sole ingress. Never expose the container
+on another port or host that skips Render.
+
 ## Personal data
 
 | Field | Why it is collected | Classification |
@@ -102,7 +115,7 @@ cron. It is idempotent and logs counts, never values.
 ## Secrets
 
 - `.env` is gitignored; `.env.example` holds placeholders only and is committed.
-- Real values live in GitHub environment secrets and the platform's secret store.
+- Real values live in GitHub secrets and Render env vars, never in the repo.
 - `.claude/settings.json` denies `Read(./.env)` and `Read(./.env.*)`, so Claude never sees them.
 - `detect-private-key` runs in pre-commit; `bandit` and `pip-audit` run in `security.yml`.
 - A leaked secret is rotated first and cleaned from history second. Rotation is what actually

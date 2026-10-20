@@ -6,7 +6,11 @@
       "Bash(git rebase *)",
       "Bash(rm -rf *)",
       "Read(./.env)",
-      "Read(./.env.*)"
+      "Read(./.env.*)",
+      "Read(!.env.example)",
+      "Edit(./.env)",
+      "Edit(./.env.*)",
+      "Edit(!.env.example)"
     ],
     "ask": [
       "Bash(gh release *)",

@@ -3,7 +3,25 @@
 *Every URL, what it accepts, what it returns, and who is allowed to reach it.*
 
 This is a server-rendered Django MTV app. "API" here means URL patterns, forms and templates.
-There are no JSON endpoints. Status: **designed, not implemented** (Milestones 2-3).
+The JSON endpoints are the operational ones below. Status of the app routes: **designed, not
+implemented** (Milestones 2-3).
+
+## Operational endpoints
+
+| Name           | Pattern        | Methods | View           | Response               | Access                     |
+|----------------|----------------|---------|----------------|------------------------|----------------------------|
+| `health`       | `/health/`     | GET     | `health`       | 200 `{"status": "ok"}` | public                     |
+| `schema`       | `/api/schema/` | GET     | `SpectacularAPIView` | OpenAPI 3 document | `ENABLE_API_DOCS` on only  |
+| `swagger-ui`   | `/api/docs/`   | GET     | `SpectacularSwaggerView` | Swagger UI page | `ENABLE_API_DOCS` on only  |
+| `ping`         | `/api/ping/`   | GET     | `PingView`     | 200 `{"status": "pong"}` | `ENABLE_API_DOCS` on only; temporary |
+
+- `health` touches no database and no session, so it answers even when the DB is down.
+- `health` allows plain HTTP (`SECURE_REDIRECT_EXEMPT` in `prod.py`), because Render's probe does
+  not send HTTPS.
+- The three docs routes answer 404 while `ENABLE_API_DOCS` is off. It is on in dev by default and
+  off in prod, so prod does not list its endpoints.
+- `ping` exists only so the schema has a path. Remove it with the first real endpoint.
+- Any other method returns 405.
 
 ## Routes
 

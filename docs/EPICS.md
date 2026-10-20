@@ -35,7 +35,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
 - [x] `Makefile`, `.pre-commit-config.yaml`, `.gitignore`
 - [x] `Dockerfile`, `docker-compose.yml`
 - [x] `lint.yml`, `test.yml`
-- [x] `security.yml`, `deploy.yml`
+- [x] `security.yml`, `deploy-dev.yml`, `deploy-prod.yml`
 - [x] `docs/SETUP.md`, `docs/CI-CD.md`
 
 **Milestone 0 complete.** `make check` is green; every workflow validates with `actionlint`; the
@@ -93,7 +93,7 @@ full gotcha list is in `docs/learning/00-milestone-0-foundation.md`.
 - [ ] `karaoke:admin_overview`. Staff-only, cancel anyone
 - [ ] `purge_expired_data` management command + scheduled run
 - [ ] `django_assert_num_queries` tests on both overviews
-- [ ] Pick the deploy provider and fill the `deploy.yml` TODO steps
+- [x] Deploy provider: Render (decided), wired through `deploy-dev.yml` and `deploy-prod.yml`
 - [ ] Accessibility pass on modal and toaster
 - [ ] Learning checklist for the milestone
 

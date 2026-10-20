@@ -35,6 +35,14 @@ SECRET_KEY = env("DJANGO_SECRET_KEY")
 
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=[])
 
+# Origins allowed to send unsafe requests from outside the site, with their scheme,
+# e.g. https://pykaraoke-dev.onrender.com. Empty means no cross-origin POSTs.
+CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
+
+# The OpenAPI schema and Swagger UI list every endpoint. Off unless the environment
+# turns them on; dev.py turns them on by default.
+ENABLE_API_DOCS = env.bool("ENABLE_API_DOCS", default=False)
+
 
 # Application definition
 
@@ -45,8 +53,22 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "rest_framework",
+    "drf_spectacular",
     "karaoke",
 ]
+
+# Django REST Framework builds the OpenAPI schema from its views. drf-spectacular
+# reads that schema and serves it, with Swagger UI, under /api/ (see interface/api/).
+REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "pykaraoke API",
+    "DESCRIPTION": "Karaoke night sign-ups. Served only while ENABLE_API_DOCS is on.",
+    "VERSION": "0.1.0",
+}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

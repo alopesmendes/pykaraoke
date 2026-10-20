@@ -6,8 +6,11 @@ cookie over.
 """
 
 from .base import *  # noqa: F403
+from .base import env
 
 DEBUG = True
+
+ENABLE_API_DOCS = env.bool("ENABLE_API_DOCS", default=True)
 
 SECURE_SSL_REDIRECT = False
 SESSION_COOKIE_SECURE = False
