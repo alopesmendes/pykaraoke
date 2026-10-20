@@ -73,6 +73,7 @@ version-pinned page instead of guessing.
 | `github-actions`     | Workflow anatomy, uv caching, service containers, environments       |
 | `devops`             | uv, Makefile, Docker, env vars, Postgres, deploy skeleton            |
 | `docs-writing`       | Doc structure, mermaid rules, doc ownership, sentence style          |
+| `guide`              | `/guide [level]`: feature walkthrough by layer, `/guide verify` at the end |
 | `learning-checklist` | `/learning-checklist`, the retention step at the end of a feature    |
 
 ## Agents
