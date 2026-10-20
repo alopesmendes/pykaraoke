@@ -30,6 +30,7 @@ feature. Every feature gets one file here.
 | 09 | [Spec-driven GitHub setup: templates, labels, draft PRs](09-spec-driven-github-setup.md) | 1 | in progress |
 | 10 | [Trimming the Claude setup, test env isolation](10-claude-setup-refactor.md) | 1 | in progress |
 | 11 | [Guided feature skill with levels and a final verify](11-guided-feature-skill.md) | 1 | in progress |
+| 12 | [One CI pipeline with five stages](12-ci-pipeline.md)       | 1         | in progress |
 
 New entries are appended here by `/learning-checklist`.
 

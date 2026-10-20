@@ -1,7 +1,9 @@
 name: Deploy prod
 
-# Manual only. Production never deploys from a push: a person picks the bump, and a
-# reviewer approves the run in the production environment before Render is told.
+# Manual only. Production never deploys from a push: a person picks the bump, CI must have
+# passed on that commit, and a reviewer approves the run in the production environment before
+# Render is told. A failed pip-audit does not block it; a failed build, lint, test or security
+# check does.
 on:
   workflow_dispatch:
     inputs:
@@ -21,27 +23,13 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # Reusable-workflow calls, so lint.yml and test.yml stay the one definition of "passes".
-  lint:
-    uses: ./.github/workflows/lint.yml
-
-  test:
-    uses: ./.github/workflows/test.yml
-
-  deploy:
-    needs: [lint, test]
+  verify:
+    # Runs before the reviewer is asked, so a red CI never reaches the approval screen.
     runs-on: ubuntu-latest
-    # Holds the job until a required reviewer approves it (set in the repo's environment settings).
-    environment:
-      name: production
     permissions:
-      contents: write # pushes the tag, and only this job needs it
+      contents: read
+      checks: read # reads the CI job results for this commit
     steps:
-      - uses: actions/checkout@v7
-        with:
-          # The tag script reads every existing tag, so the history must be complete.
-          fetch-depth: 0
-
       # Prod tags come from master only. Dispatching from a branch would tag unreviewed code.
       - name: Refuse to run off master
         env:
@@ -51,6 +39,38 @@ jobs:
             echo "Prod deploys run from master, not $REF" >&2
             exit 1
           fi
+
+      # Same jobs deploy-dev.yml waits on, minus pip-audit: a new CVE with no fix yet must not
+      # stop a deploy someone has decided to make.
+      - name: Check CI passed for this commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ github.sha }}
+        run: |
+          for job in build lint test analysis; do
+            conclusion="$(gh api "repos/$GITHUB_REPOSITORY/commits/$SHA/check-runs" --paginate \
+              -q ".check_runs[] | select(.name == \"$job\") | .conclusion" | tail -n 1)"
+            if [ "$conclusion" != "success" ]; then
+              echo "$job: ${conclusion:-no run}" >&2
+              exit 1
+            fi
+          done
+
+  deploy:
+    needs: verify
+    runs-on: ubuntu-latest
+    # Holds the job until a required reviewer approves it (set in the repo's environment settings).
+    environment:
+      name: production
+    permissions:
+      contents: write # pushes the tag, and only this job needs it
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # The commit verify checked, even if master has moved since.
+          ref: ${{ github.sha }}
+          # The tag script reads every existing tag, so the history must be complete.
+          fetch-depth: 0
 
       - name: Compute next prod tag
         id: version

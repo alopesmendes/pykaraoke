@@ -51,45 +51,45 @@ Rules:
 
 ## Django settings baseline
 
-Production must satisfy `python manage.py check --deploy` with no warnings. `security.yml` runs it
-on every push.
+Production must satisfy `python manage.py check --deploy` with no warnings. The ANALYSIS/SECURITY
+job in `ci.yml` runs it on every push. Both deploy workflows wait for it.
 
-| Setting | Production value |
-|---|---|
-| `DEBUG` | `False` |
-| `SECRET_KEY` | from the environment, never committed |
-| `ALLOWED_HOSTS` | the real hostnames, never `["*"]` |
-| `SECURE_SSL_REDIRECT` | `True` |
-| `SESSION_COOKIE_SECURE`, `CSRF_COOKIE_SECURE` | `True` |
-| `SESSION_COOKIE_HTTPONLY` | `True` |
-| `SECURE_HSTS_SECONDS` | `31536000`, with `INCLUDE_SUBDOMAINS` and `PRELOAD` |
-| `X_FRAME_OPTIONS` | `DENY` |
-| `SECURE_CONTENT_TYPE_NOSNIFF` | `True` |
-| `CSRF_TRUSTED_ORIGINS` | the real origins |
+| Setting                                       | Production value                                    |
+|-----------------------------------------------|-----------------------------------------------------|
+| `DEBUG`                                       | `False`                                             |
+| `SECRET_KEY`                                  | from the environment, never committed               |
+| `ALLOWED_HOSTS`                               | the real hostnames, never `["*"]`                   |
+| `SECURE_SSL_REDIRECT`                         | `True`                                              |
+| `SESSION_COOKIE_SECURE`, `CSRF_COOKIE_SECURE` | `True`                                              |
+| `SESSION_COOKIE_HTTPONLY`                     | `True`                                              |
+| `SECURE_HSTS_SECONDS`                         | `31536000`, with `INCLUDE_SUBDOMAINS` and `PRELOAD` |
+| `X_FRAME_OPTIONS`                             | `DENY`                                              |
+| `SECURE_CONTENT_TYPE_NOSNIFF`                 | `True`                                              |
+| `CSRF_TRUSTED_ORIGINS`                        | the real origins                                    |
 
 CSRF protection is on for every POST. The confirmation modal submits a real form with
 `{% csrf_token %}`, not a link.
 
 ## Deployment
 
-| Control | Why | What breaks if it changes |
-|---|---|---|
-| `ENABLE_API_DOCS` off in prod | `/api/schema/` and `/api/docs/` map every route; they answer 404 unless the flag is on | Setting it in prod publishes the API surface |
-| `SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")` | Render terminates TLS, so Django sees plain HTTP and would redirect forever | Behind anything but Render, a client can forge the header and fake HTTPS |
-| `SECURE_REDIRECT_EXEMPT` for `/health/` | The container health check speaks plain HTTP | Dropping it fails the check with a redirect |
-| Deploy hooks are GitHub secrets (`RENDER_DEPLOY_HOOK_DEV`, `RENDER_DEPLOY_HOOK_PROD`) | A hook URL deploys with no other auth; anyone holding it can trigger a build | Committing one means rotating it in Render first |
-| Reviewer on the `production` environment | `deploy-prod.yml` waits for a human approval before tagging and calling the hook | Without the setting the job runs unattended. TODO(verify): confirm it is set |
+| Control                                                                               | Why                                                                                                                                                                                            | What breaks if it changes                                                                                                                                        |
+|---------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `ENABLE_API_DOCS` off in prod                                                         | `/api/schema/` and `/api/docs/` map every route; they answer 404 unless the flag is on                                                                                                         | Setting it in prod publishes the API surface                                                                                                                     |
+| `SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")`                       | Render terminates TLS, so Django sees plain HTTP and would redirect forever                                                                                                                    | Behind anything but Render, a client can forge the header and fake HTTPS                                                                                         |
+| `SECURE_REDIRECT_EXEMPT` for `/health/`                                               | The container health check speaks plain HTTP                                                                                                                                                   | Dropping it fails the check with a redirect                                                                                                                      |
+| Deploy hooks are GitHub secrets (`RENDER_DEPLOY_HOOK_DEV`, `RENDER_DEPLOY_HOOK_PROD`) | A hook URL deploys with no other auth; anyone holding it can trigger a build. A workflow on any branch can read a repository secret, so the gate on who can edit workflows is what protects it | Committing one means rotating it in Render first                                                                                                                 |
+| Reviewer on the `production` environment                                              | the deploy job in `deploy-prod.yml` waits for a human approval on a manual prod run, after CI has been checked, before tagging and calling the hook                                            | The reviewer is set (`alopesmendes`). The reviewer can approve their own run and admins can bypass it, so this is a confirmation step, not an independent review |
 
 The proxy header is trusted only because Render is the sole ingress. Never expose the container
 on another port or host that skips Render.
 
 ## Personal data
 
-| Field | Why it is collected | Classification |
-|---|---|---|
-| `pseudo` | shown on the public overview | pseudonymous |
-| `full_name` | so the host knows who is coming | **PII** |
-| `contact` | one confirmation message | **PII** |
+| Field       | Why it is collected             | Classification |
+|-------------|---------------------------------|----------------|
+| `pseudo`    | shown on the public overview    | pseudonymous   |
+| `full_name` | so the host knows who is coming | **PII**        |
+| `contact`   | one confirmation message        | **PII**        |
 
 Rules:
 
@@ -100,12 +100,12 @@ Rules:
 
 ## Retention and purge
 
-| Data | Kept until | Removed by |
-|---|---|---|
-| `AccessLink.token` | `expires_at` | purge job blanks the token |
-| `Participant.full_name`, `.contact` | `starts_at` + 7 days | purge job |
-| `SongRequest` rows | `starts_at` + 7 days | purge job |
-| `pseudo`, `status`, counts | kept, no longer personal once names are gone | n/a |
+| Data                                | Kept until                                   | Removed by                 |
+|-------------------------------------|----------------------------------------------|----------------------------|
+| `AccessLink.token`                  | `expires_at`                                 | purge job blanks the token |
+| `Participant.full_name`, `.contact` | `starts_at` + 7 days                         | purge job                  |
+| `SongRequest` rows                  | `starts_at` + 7 days                         | purge job                  |
+| `pseudo`, `status`, counts          | kept, no longer personal once names are gone | n/a                        |
 
 The purge is a Django management command (`purge_expired_data`) run on a schedule by the platform's
 cron. It is idempotent and logs counts, never values.
@@ -117,7 +117,7 @@ cron. It is idempotent and logs counts, never values.
 - `.env` is gitignored; `.env.example` holds placeholders only and is committed.
 - Real values live in GitHub secrets and Render env vars, never in the repo.
 - `.claude/settings.json` denies `Read(./.env)` and `Read(./.env.*)`, so Claude never sees them.
-- `detect-private-key` runs in pre-commit; `bandit` and `pip-audit` run in `security.yml`.
+- `detect-private-key` runs in pre-commit; `bandit` runs in the ANALYSIS/SECURITY job and `pip-audit` in its own job, both in `ci.yml`.
 - A leaked secret is rotated first and cleaned from history second. Rotation is what actually
   fixes it.
 
@@ -146,4 +146,4 @@ public issue containing a working exploit.
 - Where authorisation is enforced: [ARCHITECTURE.md](ARCHITECTURE.md)
 - Which routes need which check: [API.md](API.md)
 - Fields and retention columns: [DATABASE.md](DATABASE.md)
-- Automated checks: agent `security-reviewer`, workflow `security.yml`
+- Automated checks: agent `security-reviewer`, workflow `ci.yml` (ANALYSIS/SECURITY and pip-audit jobs)

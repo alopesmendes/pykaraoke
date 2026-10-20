@@ -88,7 +88,9 @@ env = [
 # "karaoke" comes back once Milestone 1 creates that app: coverage.py warns
 # on a source package that was never imported.
 source = ["pykaraoke"]
-omit = ["*/migrations/*", "*/tests/*", "*/wsgi.py", "*/asgi.py", "manage.py"]
+# Paths in .coverage are relative to the repo, so the CI comment action can match them.
+relative_files = true
+omit =["*/migrations/*", "*/tests/*", "*/wsgi.py", "*/asgi.py", "manage.py"]
 
 [tool.coverage.report]
 show_missing = true

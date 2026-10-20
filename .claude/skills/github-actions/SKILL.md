@@ -1,40 +1,46 @@
 ---
 name: github-actions
-description: GitHub Actions conventions for pykaraoke. Workflow anatomy, uv caching, matrix builds, Postgres service containers, least-privilege permissions, environments and approval gates. Use when creating or editing anything under .github/workflows/, when CI is red or slow, or when adding a secret, an environment, or a deploy step.
+description: GitHub Actions conventions for pykaraoke. Workflow anatomy, uv caching, Postgres service containers, least-privilege permissions, deploy gating on CI, environments and approval gates. Use when creating or editing anything under .github/workflows/, when CI is red or slow, or when adding a secret, an environment, or a deploy step.
 ---
 
 # GitHub Actions (pykaraoke)
 
-Five workflows: `lint.yml`, `test.yml`, `security.yml`, `deploy-dev.yml`, `deploy-prod.yml`.
-The deploy ones call lint and test as reusable workflows (`workflow_call`), then tag and trigger
-Render. The pipeline as a whole is documented in `docs/CI-CD.md`.
+Four workflows. `ci.yml` checks the code: BUILD, LINT, TEST, ANALYSIS/SECURITY, plus pip-audit and
+the coverage jobs. Two deploy workflows wait for it: `deploy-dev.yml` (after a push to master) and
+`deploy-prod.yml` (manual, with a reviewer). The pipeline as a whole is documented in
+`docs/CI-CD.md`.
 
-## Every workflow starts the same way
+## The workflow header
 
 ```yaml
-name: Lint
+name: CI
 
 on:
   push:
     branches: [master]
   pull_request:
+  schedule:
+    - cron: "0 6 * * 1"
 
 permissions:
   contents: read
 
 concurrency:
-  group: lint-${{ github.ref }}
-  cancel-in-progress: true
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 ```
 
 Three rules behind that block:
 
 1. **`permissions` is always explicit and always minimal.** Default `contents: read`. Add
-   `contents: write` only in the deploy job that pushes the tag, `id-token: write` only for OIDC.
-   Never leave the repository default in place.
-2. **`concurrency` with `cancel-in-progress`** so a force-push does not burn minutes on a stale
-   commit. Never cancel in progress on `deploy-dev.yml` or `deploy-prod.yml`. A half-cancelled
-   deploy is worse than a wasted minute.
+   `contents: write` only in a job that pushes: a deploy (the tag) and coverage-badge (the data
+   branch). Jobs that run project code (TEST, ANALYSIS) stay read-only, so a compromised dependency
+   or conftest never sees a write token. `id-token: write` only for OIDC. Never leave the repository
+   default in place.
+2. **`concurrency` cancels only pull request runs.** A force-push does not burn minutes on a stale
+   commit. Pushes to `master` always finish, since the deploy waits on them. Deploy workflows have
+   their own group with no `cancel-in-progress`: a half-cancelled deploy is worse than a wasted
+   minute. Keep one workflow-level block per file; a second one would cancel a running deploy.
 3. **`on.pull_request` without a branch filter**, `on.push` limited to `master`. Otherwise every
    PR runs twice.
 
@@ -47,6 +53,7 @@ Three rules behind that block:
       - name: Install uv
         uses: astral-sh/setup-uv@v10.1.0
         with:
+          python-version: "3.13"
           enable-cache: true
           cache-dependency-glob: "uv.lock"
 
@@ -56,30 +63,27 @@ Three rules behind that block:
 
 - `--locked` fails if `uv.lock` is out of date with `pyproject.toml`. That is the point: CI must
   never silently resolve different versions than your machine.
+- `python-version: "3.13"` is pinned on every `setup-uv` step. Unpinned, uv picks the newest CPython,
+  and `psycopg-binary` has no wheel for 3.15. `tests/test_ci_workflow.py` fails if one drifts.
 - `cache-dependency-glob: uv.lock` keys the cache on the lockfile, so the cache invalidates
   exactly when dependencies change.
 - Pin actions to a major tag (`@v7`) when the maintainer publishes one. Do not float on `@main`.
   **Some don't publish one at all**: `astral-sh/setup-uv` only ever tags exact versions
   (`v10.1.0`, never a floating `v10`); a pin to `@v10` fails outright. Check
   `gh api repos/<owner>/<repo>/git/refs/tags` before writing the pin, not after CI fails on it.
+- Third-party actions that run with a write token are pinned to a commit SHA. The coverage action is
+  one: `py-cov-action/python-coverage-comment-action@<sha> # v4.5`.
 
-## Matrix
+## One Python version, no matrix
 
-```yaml
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.13", "3.14"]
-```
-
-`fail-fast: false` so one Python version failing still tells you about the other. Matrix only on
-`test.yml`. Linting once is enough.
+The project runs Python 3.13 only, the version in the `Dockerfile`. A second version would test an
+interpreter production never runs. Linting once is enough.
 
 ## Postgres service container
 
-Not in `test.yml` yet. Today's `DATABASE_URL` is blank (SQLite fallback) and there are zero
-models until Milestone 2. Add this block to `test.yml` alongside the first real migration, not
-speculatively ahead of it.
+Not in the `test` job yet. Today's `DATABASE_URL` is blank (SQLite fallback) and there are zero
+models until Milestone 2. Add this block to the `test` job in `ci.yml` alongside the first real
+migration, not speculatively ahead of it.
 
 ```yaml
     services:
@@ -116,18 +120,43 @@ in logs, but not values you derive from them.
 `environment:` gives two things worth having: scoped secrets, and **required reviewers**.
 That is how `deploy-prod.yml` waits for a human click instead of a branch rule.
 
-## Deploy gating
+## Deploy gating on CI
+
+Deploys are separate workflows, so they cannot run before CI has finished. Two ways to gate:
+
+- **Push to master (dev):** `on: workflow_run` on the CI workflow, with
+  `if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_branch == 'master'`.
+  Check out `ref: github.event.workflow_run.head_sha`, never the branch: master may have moved on.
+  The `event` check matters: a scheduled CI run on master also has `head_branch: master`.
+- **Manual (prod):** `on: workflow_dispatch`. A first job, `verify`, has no environment and reads the
+  check runs for `github.sha`. It requires the jobs it depends on to be `success`. A second job,
+  `deploy`, has `needs: verify` and `environment: production`, so the reviewer is asked only after
+  the check passed.
 
 ```yaml
-  deploy:
-    needs: [lint, test]
-    environment:
-      name: production
+  verify:
+    permissions:
+      checks: read
+    steps:
+      - name: Check CI passed for this commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ github.sha }}
+        run: |
+          for job in build lint test analysis; do
+            conclusion="$(gh api "repos/$GITHUB_REPOSITORY/commits/$SHA/check-runs" --paginate \
+              -q ".check_runs[] | select(.name == \"$job\") | .conclusion" | tail -n 1)"
+            [ "$conclusion" = success ] || { echo "$job: ${conclusion:-no run}" >&2; exit 1; }
+          done
 ```
 
-`needs:` chains the jobs; the `production` environment's protection rules hold the run until
-approved. Configure the reviewers in **Settings → Environments**, not in YAML. Deploy jobs
-check out with `fetch-depth: 0` because `next-version.sh` reads every tag.
+`!cancelled()`, not `always()`, on the job that deploys. `always()` would also run it after a
+cancelled run. The `needs.<job>.result` you read must be listed in that job's `needs:`. A job
+whose `needs` failed is skipped, so the gate has to be an explicit `if:`.
+
+The hook is an environment-independent repository secret in each deploy workflow, and the deploy
+step passes it through `env:`. Configure the reviewers in **Settings → Environments**, not in YAML.
+Only deploy jobs check out with `fetch-depth: 0`, because `next-version.sh` reads every tag.
 
 ## Verify a workflow before pushing it
 

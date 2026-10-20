@@ -93,7 +93,7 @@ full gotcha list is in `docs/learning/00-milestone-0-foundation.md`.
 - [ ] `karaoke:admin_overview`. Staff-only, cancel anyone
 - [ ] `purge_expired_data` management command + scheduled run
 - [ ] `django_assert_num_queries` tests on both overviews
-- [x] Deploy provider: Render (decided), wired through `deploy-dev.yml` and `deploy-prod.yml`
+- [x] Deploy provider: Render (decided), wired through `ci.yml` (DEPLOY job)
 - [ ] Accessibility pass on modal and toaster
 - [ ] Learning checklist for the milestone
 

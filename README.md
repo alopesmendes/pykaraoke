@@ -1,5 +1,7 @@
 # pykaraoke
 
+[![Coverage](https://raw.githubusercontent.com/alopesmendes/pykaraoke/python-coverage-comment-action-data/badge.svg)](https://github.com/alopesmendes/pykaraoke/tree/python-coverage-comment-action-data)
+
 *A small private site where friends sign up for karaoke night and pick their songs in advance.*
 
 One unguessable link per event. No accounts, no passwords, no app to install. Open the link, put
@@ -14,11 +16,11 @@ It is also a **learning project**. Every feature ships with a checklist in
 [docs/EPICS.md](docs/EPICS.md).
 
 | Milestone | Scope                              | State |
-|-----------|-------------------------------------|-------|
-| 0         | Docs, CI/CD, AI workflow            | done  |
-| 1         | App skeleton, settings split, i18n  | todo  |
-| 2         | Link access + sign-up form          | todo  |
-| 3         | Overviews, song requests, admin     | todo  |
+|-----------|------------------------------------|-------|
+| 0         | Docs, CI/CD, AI workflow           | done  |
+| 1         | App skeleton, settings split, i18n | todo  |
+| 2         | Link access + sign-up form         | todo  |
+| 3         | Overviews, song requests, admin    | todo  |
 
 ## Quickstart
 
