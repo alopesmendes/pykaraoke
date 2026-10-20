@@ -1,0 +1,75 @@
+name: Deploy prod
+
+# Manual only. Production never deploys from a push: a person picks the bump, and a
+# reviewer approves the run in the production environment before Render is told.
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Which part of the latest prod version to raise
+        type: choice
+        options: [patch, minor, major]
+        default: patch
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-prod
+  # No cancel-in-progress: a deploy cancelled half-way is worse than one that waits.
+  cancel-in-progress: false
+
+jobs:
+  # Reusable-workflow calls, so lint.yml and test.yml stay the one definition of "passes".
+  lint:
+    uses: ./.github/workflows/lint.yml
+
+  test:
+    uses: ./.github/workflows/test.yml
+
+  deploy:
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+    # Holds the job until a required reviewer approves it (set in the repo's environment settings).
+    environment:
+      name: production
+    permissions:
+      contents: write # pushes the tag, and only this job needs it
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # The tag script reads every existing tag, so the history must be complete.
+          fetch-depth: 0
+
+      # Prod tags come from master only. Dispatching from a branch would tag unreviewed code.
+      - name: Refuse to run off master
+        env:
+          REF: ${{ github.ref }}
+        run: |
+          if [ "$REF" != "refs/heads/master" ]; then
+            echo "Prod deploys run from master, not $REF" >&2
+            exit 1
+          fi
+
+      - name: Compute next prod tag
+        id: version
+        env:
+          BUMP: ${{ inputs.bump }}
+        run: |
+          # Assign first: inside echo, a failing script would write an empty tag and pass.
+          tag="$(.github/scripts/next-version.sh "$BUMP")"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - name: Tag the commit
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          git tag "$TAG" "$GITHUB_SHA"
+          git push origin "refs/tags/$TAG"
+
+      # ref pins the build to this commit, so a later push cannot slip in between the tag and the build.
+      - name: Trigger the Render prod deploy
+        env:
+          DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_PROD }}
+        run: curl -fsS -X POST "${DEPLOY_HOOK}&ref=${GITHUB_SHA}"
