@@ -51,14 +51,28 @@ EOF
 
 - `git push -u origin HEAD`. Never `--force`. If the push is refused, stop and report; do not rebase.
 
-## 5. Mark the PR ready
+## 5. Check the Requirements in the PR
 
-- Delegate to agent `issue-orchestrator`, mode **ready**, with the PR number and the report that
-  `make check` is green.
-- The orchestrator checks that every Requirement, Accept criterion and Tests item is ticked. If one
-  is not, it refuses and names it. Report that and stop; do not tick boxes here.
-- If the PR is already ready, the orchestrator reports it and changes nothing.
-- The PR body is not rewritten here. It was generated from the issue when the draft was opened.
+Ready needs every box ticked. Ticks come from the orchestrator, so this step proves each item first.
+
+1. Read the list to check: `gh pr view --json body` (Accept criteria and Tests) and
+   `gh issue view N --json body` (the `## Requirements` section). Match each Requirement to its
+   Tests line in the PR, the line that names the test proving it.
+2. For each Requirement, check the evidence in the working tree, not the box:
+   - Automated Tests line: run that test (`uv run pytest <path>::<name>` or `-k`). Pass or fail.
+   - Non-test Requirement (settings, docs, CHANGELOG, agent or command file): check the file
+     directly, for example the line the Requirement names exists and reads as the issue says.
+   - Manual check, with no automated test: do not decide it yourself. Ask the user to confirm it
+     passed, and wait for the answer.
+3. Build a table: Requirement | Tests line | evidence | pass / fail / needs confirmation.
+4. Passing items: delegate to `issue-orchestrator`, mode **sync**, with the Requirement texts that
+   passed and the Tests lines that passed. It ticks the boxes; this command does not.
+5. Any fail: stop, print the table, and do not tick or mark ready.
+6. Once every Requirement and Tests line is ticked: delegate to `issue-orchestrator`, mode
+   **ready**, with the PR number and the `make check` green report. It refuses if anything is
+   still unticked, and names it.
+7. If the PR is already ready, the orchestrator reports it and changes nothing.
+8. The PR body is not rewritten here. It was generated from the issue when the draft was opened.
 
 ## 6. Report
 
