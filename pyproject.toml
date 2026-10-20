@@ -7,9 +7,9 @@ requires-python = ">=3.13"
 license = { text = "MIT" }
 
 dependencies = [
-    "django>=6.1,<6.2",
+    "django==6.1.2",
     "django-environ>=0.12",
-    "psycopg[binary]>=3.2",
+    "psycopg[binary]==3.3.6",
     "gunicorn>=23.0",
     "whitenoise>=6.12.0",
     "djangorestframework>=3.18.3",
