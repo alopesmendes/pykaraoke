@@ -34,8 +34,8 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
 - [x] `tests/` smoke test + pytest config
 - [x] `Makefile`, `.pre-commit-config.yaml`, `.gitignore`
 - [x] `Dockerfile`, `docker-compose.yml`
-- [x] `lint.yml`, `test.yml`
-- [x] `security.yml`, `deploy-dev.yml`, `deploy-prod.yml`
+- [x] CI workflow (`ci.yml`, one pipeline)
+- [x] `deploy-dev.yml`, `deploy-prod.yml`
 - [x] `docs/SETUP.md`, `docs/CI-CD.md`
 
 **Milestone 0 complete.** `make check` is green; every workflow validates with `actionlint`; the
