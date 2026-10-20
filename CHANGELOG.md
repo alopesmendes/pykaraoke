@@ -28,6 +28,7 @@ Entries are written for someone **using** the site, not for someone reading the 
   hosting platform can tell when the site is up.
 - Docker image serves on the port the host sets (`PORT`), applies migrations when it starts, and
   reports healthy once `/health/` answers.
+- API documentation (OpenAPI schema and Swagger UI at `/api/docs/`), on in development only.
 
 ### Changed
 - Claude Code issue flow: `/karaoke-issue-launch` reads the issue's Requirements, opens a draft PR

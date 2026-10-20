@@ -53,8 +53,22 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "rest_framework",
+    "drf_spectacular",
     "karaoke",
 ]
+
+# Django REST Framework builds the OpenAPI schema from its views. drf-spectacular
+# reads that schema and serves it, with Swagger UI, under /api/ (see interface/api/).
+REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "pykaraoke API",
+    "DESCRIPTION": "Karaoke night sign-ups. Served only while ENABLE_API_DOCS is on.",
+    "VERSION": "0.1.0",
+}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
