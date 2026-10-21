@@ -22,6 +22,9 @@
 - **HSTS**: a browser caches "https only" for `SECURE_HSTS_SECONDS`. Hard to undo, so dev sets 0.
 - **Hardcode vs env var for `DEBUG`**: an env var can be forgotten or mistyped into prod. A prod
   module cannot.
+- **`ENV DJANGO_SETTINGS_MODULE=pykaraoke.settings.prod` in the Dockerfile**: if the variable is
+  forgotten at runtime, `manage.py` falls back to dev (`DEBUG=True`). Baking in prod makes the
+  forgotten case the strict one. `docker run -e ...` still overrides it for a local dev run.
 
 ## Docs to read
 
@@ -77,9 +80,3 @@
 
 - `SECURE_PROXY_SSL_HEADER`: needed once a reverse proxy terminates TLS, and only safe if the
   proxy overwrites the header. Decide with the deploy provider (Milestone 3).
-
-## Decision
-
-- **`ENV DJANGO_SETTINGS_MODULE=pykaraoke.settings.prod` in the Dockerfile.** If the variable is
-  forgotten at runtime, `manage.py` would fall back to dev (`DEBUG=True`). Baking in prod makes
-  the forgotten case the strict one. `docker run -e ...` still overrides it for a local dev run.

@@ -1,15 +1,3 @@
----
-name: guided-feature-skill
-description: Guided implementation of a feature with /guide, one layer at a time, and /guide verify at the end
-branch: chore/30-guided-feature-skill-with-levels-and-a-final-verify
-issue: 30
-tools: Read, Glob, Grep, Bash, Edit, Write
-model: claude-sonnet-5-5
-effort: medium
-memory: none
-level: beginner
----
-
 # 11: Guided feature skill with levels and a final verify
 
 *What to learn from building `/guide`. Milestone 1.*

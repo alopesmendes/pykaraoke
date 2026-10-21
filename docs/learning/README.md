@@ -18,19 +18,19 @@ feature. Every feature gets one file here.
 
 | #  | Checklist                                                   | Milestone | Status      |
 |----|-------------------------------------------------------------|-----------|-------------|
-| 00 | [Foundation & infrastructure](00-milestone-0-foundation.md) | 0         | in progress |
-| 01 | [Settings split by environment](01-settings-split.md)       | 1         | in progress |
-| 02 | [Base template and template directory](02-base-template.md) | 1         | in progress |
-| 03 | [i18n setup: fr default, ja secondary](03-i18n-setup.md)    | 1         | in progress |
-| 04 | [Wire PostgreSQL via DATABASE_URL](04-postgres-database-url.md) | 0     | in progress |
-| 05 | [Milestone 1 close-out: an empty app that boots](05-milestone-1-architecture.md) | 1 | in progress |
-| 06 | [Static files pipeline via WhiteNoise](06-static-files-whitenoise.md) | 1 | in progress |
-| 07 | [Test tooling: factories, shared fixtures, db access](07-test-tooling.md) | 1 | in progress |
-| 08 | [The service layer files: services, exceptions, managers](08-service-layer-files.md) | 1 | in progress |
-| 09 | [Spec-driven GitHub setup: templates, labels, draft PRs](09-spec-driven-github-setup.md) | 1 | in progress |
-| 10 | [Trimming the Claude setup, test env isolation](10-claude-setup-refactor.md) | 1 | in progress |
-| 11 | [Guided feature skill with levels and a final verify](11-guided-feature-skill.md) | 1 | in progress |
-| 12 | [One CI pipeline with chained stages](12-ci-pipeline.md)    | 1         | in progress |
+| 00 | [Foundation & infrastructure](00-milestone-0-foundation.md) | 0         | done        |
+| 01 | [Settings split by environment](01-settings-split.md)       | 1         | done        |
+| 02 | [Base template and template directory](02-base-template.md) | 1         | done        |
+| 03 | [i18n setup: fr default, ja secondary](03-i18n-setup.md)    | 1         | done        |
+| 04 | [Wire PostgreSQL via DATABASE_URL](04-postgres-database-url.md) | 0     | done        |
+| 05 | [Milestone 1 close-out: an empty app that boots](05-milestone-1-architecture.md) | 1 | done        |
+| 06 | [Static files pipeline via WhiteNoise](06-static-files-whitenoise.md) | 1 | done        |
+| 07 | [Test tooling: factories, shared fixtures, db access](07-test-tooling.md) | 1 | done        |
+| 08 | [The service layer files: services, exceptions, managers](08-service-layer-files.md) | 1 | done        |
+| 09 | [Spec-driven GitHub setup: templates, labels, draft PRs](09-spec-driven-github-setup.md) | 1 | done        |
+| 10 | [Trimming the Claude setup, test env isolation](10-claude-setup-refactor.md) | 1 | done        |
+| 11 | [Guided feature skill with levels and a final verify](11-guided-feature-skill.md) | 1 | done        |
+| 12 | [One CI pipeline with chained stages](12-ci-pipeline.md)    | 1         | done        |
 
 New entries are appended here by `/learning-checklist`.
 

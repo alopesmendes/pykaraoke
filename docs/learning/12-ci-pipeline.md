@@ -1,15 +1,3 @@
----
-name: ci-pipeline
-description: One CI workflow with chained stages, separate deploy workflows gated on CI, and coverage jobs with split permissions
-branch: chore/31-split-ci-cd-into-build-lint-test-analysis-security
-issue: 31
-tools: Read, Glob, Grep, Bash, Edit, Write
-model: claude-sonnet-5-5
-effort: medium
-memory: none
-level: beginner
----
-
 # 12: One CI pipeline with chained stages
 
 *What to learn from the CI rework. Milestone 1.*

@@ -23,8 +23,9 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
 
 ### 0.3 AI workflow
 - [x] `.claude/settings.json`. Permissions and format hook
-- [x] 9 skills under `.claude/skills/`
-- [x] 9 agents under `.claude/agents/`
+- [x] 7 skills under `.claude/skills/`
+- [x] 8 agents under `.claude/agents/`
+- [x] 3 commands under `.claude/commands/`
 - [x] `CLAUDE.md`. The index
 - [x] `docs/AI-WORKFLOW.md`. The guideline
 
@@ -48,14 +49,19 @@ full gotcha list is in `docs/learning/00-milestone-0-foundation.md`.
 **Goal:** the `karaoke` app exists with its layers in place and nothing in it yet.
 **Done when:** an empty app boots, settings are split per environment, and the test tooling proves it.
 
-- [ ] `python manage.py startapp karaoke`
-- [ ] Settings split: `settings/base.py`, `dev.py`, `prod.py`
-- [ ] Wire PostgreSQL via `DATABASE_URL`
-- [ ] Create the layer files: `services.py`, `exceptions.py`, `managers.py`
-- [x] `templates/base.html` with content block, toaster region, modal container
-- [x] i18n setup: `LANGUAGE_CODE = "fr"`, `LANGUAGES = [fr, ja]`, `locale/` directory
-- [x] Static files pipeline (WhiteNoise)
-- [x] `tests/factories.py` scaffold + `conftest.py` fixtures
+- [x] `python manage.py startapp karaoke` (#3)
+- [x] Settings split: `settings/base.py`, `dev.py`, `prod.py` (#4)
+- [x] Wire PostgreSQL via `DATABASE_URL` (#5)
+- [x] Create the layer files: `services.py`, `exceptions.py`, `managers.py` (#6)
+- [x] `templates/base.html` with content block, toaster region, modal container (#7)
+- [x] i18n setup: `LANGUAGE_CODE = "fr"`, `LANGUAGES = [fr, ja]`, `locale/` directory (#8)
+- [x] Static files pipeline (WhiteNoise) (#9)
+- [x] `tests/factories.py` scaffold + `conftest.py` fixtures (#10)
+- [x] Deploy backend to Render, dev and prod, tag-driven CI/CD and Swagger (#26)
+- [x] Spec-driven GitHub setup: issue and PR templates, labels (#22)
+- [x] Claude setup trimmed to what the project uses (#29)
+- [x] `/guide` guided feature skill with a final verify (#30)
+- [x] CI split into BUILD, LINT, TEST, ANALYSIS/SECURITY, DEPLOY (#31)
 - [ ] Learning checklist for the milestone
 
 ---
@@ -93,7 +99,6 @@ full gotcha list is in `docs/learning/00-milestone-0-foundation.md`.
 - [ ] `karaoke:admin_overview`. Staff-only, cancel anyone
 - [ ] `purge_expired_data` management command + scheduled run
 - [ ] `django_assert_num_queries` tests on both overviews
-- [x] Deploy provider: Render (decided), wired through `ci.yml` (DEPLOY job)
 - [ ] Accessibility pass on modal and toaster
 - [ ] Learning checklist for the milestone
 
@@ -104,7 +109,8 @@ full gotcha list is in `docs/learning/00-milestone-0-foundation.md`.
 - One issue per checkbox, one PR per issue, `feat/`, `fix/` or `chore/` branch.
 - Every feature ends with a learning checklist. Run `/learning-checklist`.
 - Every change to behaviour updates the doc that owns it (see the `docs-writing` skill).
-- Claude never commits or pushes. That is the human's move.
+- `/commit-push-pr` commits and pushes; `issue-orchestrator` opens the draft PR and marks it ready.
+  Claude never merges. Merging is the human's move.
 
 ## See also
 
