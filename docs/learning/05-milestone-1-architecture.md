@@ -72,19 +72,14 @@ Answer from memory. Open the answer only after committing to one.
 
 ## Gotchas hit
 
-- **Issue said "close out once the skeleton is in place"**, but `docs/EPICS.md` still had
-  `services.py`, `exceptions.py`, `managers.py`, WhiteNoise and `tests/factories.py` unchecked
-  → the skeleton is not complete → this checklist covers only what exists; the Milestone 1
-  box in `EPICS.md` stays open until those land.
+- **The close-out was first planned before its work was done.** `EPICS.md` still listed the
+  layer files, WhiteNoise and `tests/factories.py` as open, so the milestone was not finished
+  when the issue said it was. The fix was to finish those items first (see checklists 06–08)
+  and tick the Milestone 1 boxes only when the files exist.
 
 ## Still unclear
 
 - Exact order in which Django imports `apps.py`, `models.py` and `admin.py` at startup. Read
   `django/apps/registry.py` once.
-- WhiteNoise: how static files are served in prod without a reverse proxy. Not built yet.
-
-## Next (not built yet)
-
 - Why a view should never hold business rules: what breaks when `reserve_seat` lives in a view
   and a management command both need it.
-- Why `managers.py` is a custom `QuerySet`/`Manager` home, and when a model method is enough.
