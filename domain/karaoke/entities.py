@@ -27,4 +27,4 @@ class RecoveryCode:
     participant_id: uuid.UUID
     code_hash: str
     created_at: datetime
-    rotated_at: datetime
+    rotated_at: datetime | None
