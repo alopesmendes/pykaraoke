@@ -55,7 +55,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "drf_spectacular",
-    "karaoke",
+    "infrastructure.db.karaoke",
 ]
 
 # Django REST Framework builds the OpenAPI schema from its views. drf-spectacular
