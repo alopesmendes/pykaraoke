@@ -2,6 +2,7 @@ import uuid
 from datetime import UTC, datetime
 
 import pytest
+from django.contrib.auth import get_user_model
 
 from domain.karaoke.entities import Participant, RecoveryCode
 from domain.karaoke.exceptions import PseudoTaken
@@ -61,3 +62,21 @@ def test_replace_recovery_code_updates_the_same_row():
     repo.replace_recovery_code(new_code)
     assert RecoveryCodeModel.objects.count() == 1
     assert repo.find_by_pseudo("marie") == (participant, new_code)
+
+
+def test_add_creates_an_auth_user_named_after_the_participant_id():
+    participant, code = make_pair("marie")
+
+    DjangoParticipantRepository().add_with_recovery_code(participant, code)
+    user = get_user_model().objects.get(username=str(participant.id))
+    assert not user.has_usable_password()
+
+
+def test_duplicate_pseudo_leaves_no_second_auth_user():
+    repo = DjangoParticipantRepository()
+    repo.add_with_recovery_code(*make_pair("Marie"))
+
+    with pytest.raises(PseudoTaken):
+        repo.add_with_recovery_code(*make_pair("marie"))
+
+    assert get_user_model().objects.count() == 1

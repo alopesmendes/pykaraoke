@@ -14,6 +14,7 @@ dependencies = [
     "whitenoise>=6.12.0",
     "djangorestframework>=3.18.3",
     "drf-spectacular>=0.30.0",
+    "djangorestframework-simplejwt>=5.5.1",
 ]
 
 # Local-only tooling (PEP 735). Never published, never in the production image:
@@ -79,6 +80,7 @@ addopts = ["-ra", "--strict-markers", "--strict-config"]
 # the real .env. This key is a random throwaway, never a real secret.
 env = [
     "DJANGO_SECRET_KEY=LoGfWyqNt1XvFHL13638FhEjHLTKcrUwIyqqAaT-lrp97qUsC_S7Un3QyQVVHJr9fOc",
+    "JWT_SIGNING_KEY=5gs4-SRCHw5Q9e4kGgMuDks28_EPUAgKqpVvj9ij1IncnTQMyWKmir1P7sw67GZ-",
     "DJANGO_ALLOWED_HOSTS=testserver",
     # The prod default is asserted by test_settings.py; a local .env must not change it.
     "ENABLE_API_DOCS=False",

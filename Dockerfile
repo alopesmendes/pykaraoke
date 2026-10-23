@@ -22,7 +22,8 @@ ENV DJANGO_SETTINGS_MODULE="pykaraoke.settings.prod"
 # Runs as root, so the files land root-owned and readable by the app user.
 # The secret is a placeholder for this one command: collectstatic needs a
 # key to load settings, not a real one, and it is not kept in the layer.
-RUN DJANGO_SECRET_KEY=collectstatic-only python manage.py collectstatic --noinput
+RUN DJANGO_SECRET_KEY=collectstatic-only JWT_SIGNING_KEY=collectstatic-only \
+    python manage.py collectstatic --noinput
 # The SQLite file lives next to manage.py, so the app user must own /app.
 RUN chown app:app /app
 USER app

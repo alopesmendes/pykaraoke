@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.db import IntegrityError, transaction
 from django.db.models.functions import Lower
 
@@ -12,6 +13,8 @@ class DjangoParticipantRepository(ParticipantRepository):
     def add_with_recovery_code(cls, participant: Participant, recovery_code: RecoveryCode) -> None:
         try:
             with transaction.atomic():
+                get_user_model().objects.create_user(username=str(participant.id))
+
                 ParticipantModel.objects.create(
                     id=participant.id,
                     fullname=participant.fullname,
