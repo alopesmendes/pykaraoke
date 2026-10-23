@@ -12,8 +12,9 @@ Entries are written for someone **using** the site, not for someone reading the 
 ### Added
 - Guided feature sessions: `/guide [beginner|intermediate|advanced]` walks through the feature on
   the current branch one layer at a time, showing the code (you type it). `/guide ignore` implements
-  it without a walkthrough. `/guide verify` ends the session with lint, tests, Django checks, layer
-  import rules and doc checks.
+  it without a walkthrough. `/guide next` verifies, commits the finished step and shows the next
+  one. `/guide verify` ends the session with lint, tests, Django checks, layer import rules and
+  doc checks.
 - Project documentation: architecture, database, API, security, epics.
 - Learning checklists under `docs/learning/`, one per feature. Milestone 1 checklist added
   (app skeleton, settings split, Postgres, base template, i18n).
