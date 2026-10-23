@@ -13,6 +13,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
 
 import environ
@@ -55,8 +56,25 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "drf_spectacular",
-    "karaoke",
+    "rest_framework_simplejwt.token_blacklist",
+    "infrastructure.db.karaoke",
 ]
+
+JWT_SIGNING_KEY = env("JWT_SIGNING_KEY")
+
+SIMPLE_JWT = {
+    "ALGORITHM": "HS256",
+    "SIGNING_KEY": JWT_SIGNING_KEY,
+    "ISSUER": "pykaraoke",
+    "AUDIENCE": "pykaraoke",
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=10),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "USER_ID_FIELD": "username",
+    "USER_ID_CLAIM": "sub",
+    "TOKEN_TYPE_CLAIM": "typ",
+}
 
 # Django REST Framework builds the OpenAPI schema from its views. drf-spectacular
 # reads that schema and serves it, with Swagger UI, under /api/ (see interface/api/).

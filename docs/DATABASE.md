@@ -110,7 +110,7 @@ Songs a participant wants to sing. The "gain time choosing their songs" goal.
 
 | Field         | Type                                     | Notes                          |
 |---------------|------------------------------------------|--------------------------------|
-| `participant` | `ForeignKey(Participant, CASCADE)`       | `related_name="song_requests"` |
+| `entities.py` | `ForeignKey(Participant, CASCADE)`       | `related_name="song_requests"` |
 | `title`       | `CharField(160)`                         |                                |
 | `artist`      | `CharField(120, blank=True, default="")` |                                |
 | `position`    | `PositiveSmallIntegerField(default=0)`   | The participant's own ordering |

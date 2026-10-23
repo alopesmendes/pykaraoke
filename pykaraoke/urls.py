@@ -23,4 +23,5 @@ urlpatterns = [
     path("", include("interface.api.health.urls")),
     path("", include("interface.api.docs.urls")),
     path("", include("interface.api.ping.urls")),
+    path("", include("interface.api.karaoke.urls")),
 ]
