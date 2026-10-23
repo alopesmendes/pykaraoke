@@ -133,7 +133,7 @@ Read it top to bottom: guard clauses first, happy path last, one return type.
 | Constant | `UPPER_SNAKE`            | `MAX_SONGS_PER_PERSON` |
 | Private  | leading `_`              | `_build_token`         |
 
-Never abbreviate: `participant`, not `part`. Never `data`, `info`, `obj`, `tmp` as a name.
+Never abbreviate: `entities.py`, not `part`. Never `data`, `info`, `obj`, `tmp` as a name.
 
 ### Errors
 
