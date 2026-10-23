@@ -1,4 +1,5 @@
 import hmac
+import logging
 import secrets
 import uuid
 from dataclasses import dataclass
@@ -10,12 +11,13 @@ from application.karaoke.interfaces import (
     TokenIssuer,
     TokenPair,
 )
-from domain.karaoke.entities import Participant, RecoveryCode
-from domain.karaoke.exceptions import InvalidCredentials
+from domain.karaoke.entities import Admin, Participant, RecoveryCode
+from domain.karaoke.exceptions import InvalidCredentials, NotAdmin, RecoveryCodeNotFound
 
 UNKNOWN_PSEUDO_HASH = "0" * 64
 
 RECOVERY_CODE_BYTES = 16  # 128 bits
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -69,3 +71,32 @@ def sign_in(
     if found is None or not code_matches:
         raise InvalidCredentials("invalid pseudo or recovery code")
     return issuer.issue(found[0].id)
+
+
+def reset_recovery_code(
+    participants: ParticipantRepository,
+    hasher: RecoveryCodeHasher,
+    issuer: TokenIssuer,
+    *,
+    admin: Admin,
+    pseudo: str,
+) -> str:
+    if not admin.is_staff:
+        raise NotAdmin("admin rights required")
+    found = participants.find_by_pseudo(pseudo)
+    if not found:
+        raise RecoveryCodeNotFound("invalid pseudo or recovery code")
+
+    participant, old_code = found
+    raw_code = secrets.token_urlsafe(RECOVERY_CODE_BYTES)
+    participants.replace_recovery_code(
+        RecoveryCode(
+            participant_id=participant.id,
+            code_hash=hasher.hash(raw_code),
+            created_at=old_code.created_at,
+            rotated_at=datetime.now(UTC),
+        )
+    )
+    issuer.revoke_all(participant.id)
+    logger.info("recovery code reset by admin=%s for participant=%s", admin.id, participant.id)
+    return raw_code

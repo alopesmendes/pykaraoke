@@ -23,6 +23,14 @@ class Participant:
 
 
 @dataclass(frozen=True)
+class Admin:
+    id: uuid.UUID
+    is_staff: bool
+    fullname: str
+    created_at: datetime
+
+
+@dataclass(frozen=True)
 class RecoveryCode:
     participant_id: uuid.UUID
     code_hash: str

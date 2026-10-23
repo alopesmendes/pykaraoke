@@ -20,6 +20,10 @@ class ParticipantRepository(ABC):
     def find_by_pseudo(cls, pseudo: str) -> tuple[Participant, RecoveryCode] | None:
         """Match the pseudo whatever its case. Return None if it does not exist."""
 
+    @abstractclassmethod
+    def replace_recovery_code(cls, recovery_code: RecoveryCode) -> None:
+        """Return the new hex SHA-256 of the code and erase the old one."""
+
 
 class RecoveryCodeHasher(ABC):
     @abstractclassmethod
@@ -31,3 +35,7 @@ class TokenIssuer(ABC):
     @abstractclassmethod
     def issue(cls, participant_id: uuid.UUID) -> TokenPair:
         """Create an access and refresh token for this participant."""
+
+    @abstractclassmethod
+    def revoke_all(cls, participant_id: uuid.UUID) -> None:
+        """Blacklist every outstanding refresh token of this participant."""

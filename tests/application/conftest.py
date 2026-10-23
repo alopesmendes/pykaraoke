@@ -33,6 +33,11 @@ class FakeParticipantRepository(ParticipantRepository):
             return None
         return self.participants[key], self.codes[key]
 
+    def replace_recovery_code(self, recovery_code: RecoveryCode) -> None:
+        for key, participant in self.participants.items():
+            if participant.id == recovery_code.participant_id:
+                self.codes[key] = recovery_code
+
 
 class FakeRecoveryCodeHasher(RecoveryCodeHasher):
     @classmethod
@@ -41,12 +46,20 @@ class FakeRecoveryCodeHasher(RecoveryCodeHasher):
 
 
 class FakeTokenIssuer(TokenIssuer):
+    revoked: list[uuid.UUID]
+
+    def __init__(self):
+        self.revoked = []
+
     @classmethod
     def issue(cls, participant_id: uuid.UUID) -> TokenPair:
         return TokenPair(
             access_token=f"access_token:{participant_id}",
             refresh_token=f"refresh_token:{participant_id}",
         )
+
+    def revoke_all(self, participant_id: uuid.UUID) -> None:
+        self.revoked.append(participant_id)
 
 
 @pytest.fixture
