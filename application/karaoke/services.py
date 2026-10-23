@@ -1,3 +1,4 @@
+import hmac
 import secrets
 import uuid
 from dataclasses import dataclass
@@ -10,6 +11,9 @@ from application.karaoke.interfaces import (
     TokenPair,
 )
 from domain.karaoke.entities import Participant, RecoveryCode
+from domain.karaoke.exceptions import InvalidCredentials
+
+UNKNOWN_PSEUDO_HASH = "0" * 64
 
 RECOVERY_CODE_BYTES = 16  # 128 bits
 
@@ -49,3 +53,19 @@ def sign_up(
         recovery_code=raw_code,
         tokens=issuer.issue(participant.id),
     )
+
+
+def sign_in(
+    participants: ParticipantRepository,
+    hasher: RecoveryCodeHasher,
+    issuer: TokenIssuer,
+    *,
+    pseudo: str,
+    recovery_code: str,
+) -> TokenPair:
+    found = participants.find_by_pseudo(pseudo)
+    stored_hash = found[1].code_hash if found else UNKNOWN_PSEUDO_HASH
+    code_matches = hmac.compare_digest(hasher.hash(recovery_code), stored_hash)
+    if found is None or not code_matches:
+        raise InvalidCredentials("invalid pseudo or recovery code")
+    return issuer.issue(found[0].id)

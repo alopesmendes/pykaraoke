@@ -16,6 +16,10 @@ class ParticipantRepository(ABC):
     def add_with_recovery_code(cls, participant: Participant, recovery_code: RecoveryCode) -> None:
         """Save both or neither. Raise PseudoTaken if the pseudo exists, whatever its case."""
 
+    @abstractclassmethod
+    def find_by_pseudo(cls, pseudo: str) -> tuple[Participant, RecoveryCode] | None:
+        """Match the pseudo whatever its case. Return None if it does not exist."""
+
 
 class RecoveryCodeHasher(ABC):
     @abstractclassmethod

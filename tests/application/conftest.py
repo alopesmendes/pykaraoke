@@ -27,6 +27,12 @@ class FakeParticipantRepository(ParticipantRepository):
         self.participants[key] = participant
         self.codes[key] = recovery_code
 
+    def find_by_pseudo(self, pseudo: str) -> tuple[Participant, RecoveryCode] | None:
+        key = pseudo.lower()
+        if key not in self.participants:
+            return None
+        return self.participants[key], self.codes[key]
+
 
 class FakeRecoveryCodeHasher(RecoveryCodeHasher):
     @classmethod
